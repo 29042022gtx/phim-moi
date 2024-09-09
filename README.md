@@ -1,5 +1,7 @@
 # PhimMoi
 
+cre: Nguyen Duc Long, Nguyen Thi Mi Hi, Huynh Chi Hao
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.1.
 
 ## Development server

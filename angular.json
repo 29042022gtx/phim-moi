@@ -24,12 +24,24 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets"
               }
             ],
             "styles": [
+              "node_modules/bootstrap-icons/font/bootstrap-icons.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/swiper/swiper-bundle.min.css",
+              "src/style/swiper.css",
+              "src/style/form.css",
               "src/styles.css"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+              "src/script.js"
+            ],
             "server": "src/main.server.ts",
             "prerender": true,
             "ssr": {
