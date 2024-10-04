@@ -1,0 +1,12 @@
+<h1>Disabled Directive</h1>
+<div class="d-flex flex-wrap gap-1">
+  <button class="btn btn-outline-dark" (click)="disable()">
+    Click to disable
+  </button>
+  <button class="btn btn-outline-dark" [disabled]="isDisabled" (click)="popMessage()">
+    Message
+  </button>
+  <button class="btn btn-outline-dark" [hidden]="!isDisabled" (click)="enable()">
+    Click to enable
+  </button>
+</div>

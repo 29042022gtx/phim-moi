@@ -1,0 +1,30 @@
+<main>
+  <div class="card">
+    <div class="card-header fs-5 fw-bold text-center">
+      Tong hieu tich thuong
+    </div>
+    <div class="card-body">
+      <label for="a">So a: {{getInt(a)}}</label>
+      <input class="form-control" type="text" [(ngModel)]="a" name="a" id="a" />
+      <label for="b">So b: {{getInt(b)}}</label>
+      <input class="form-control" type="text" [(ngModel)]="b" name="b" id="b" />
+      
+    </div>
+    <div class="card-footer fw-bold text-danger">
+      <div>
+        Tong: {{ sum(getInt(a), getInt(b)) }}
+      </div>
+      <div>
+        Hieu: {{ subtract(getInt(a), getInt(b)) }}
+      </div>
+      <div>
+        Tich: {{ multiply(getInt(a), getInt(b)) }}
+      </div>
+      <div>
+        Thuong: {{ divide(getInt(a), getInt(b)) }}
+      </div>
+
+
+    </div>
+  </div>
+</main>

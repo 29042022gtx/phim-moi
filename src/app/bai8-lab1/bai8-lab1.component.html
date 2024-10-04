@@ -1,0 +1,19 @@
+<main>
+  <div class="card">
+    <div class="card-header fs-5 fw-bold text-center">
+      Day so tang dan
+    </div>
+    <div class="card-body">
+      <label for="a">So a: {{getFloat(a)}}</label>
+      <input class="form-control" type="text" [(ngModel)]="a" name="a" id="a" />
+      <label for="b">So b: {{getFloat(b)}}</label>
+      <input class="form-control" type="text" [(ngModel)]="b" name="b" id="b" />
+      <label for="c">So c: {{getFloat(c)}}</label>
+      <input class="form-control" type="text" [(ngModel)]="c" name="c" id="c" />
+      
+    </div>
+    <div class="card-footer fw-bold text-danger">
+      Tang dan: {{ inDayTangDan() }}
+    </div>
+  </div>
+</main>
