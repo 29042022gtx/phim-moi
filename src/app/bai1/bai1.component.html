@@ -1,0 +1,12 @@
+<div class="card">
+  <div class="card-header text-info fs-5 fw-bold">
+    So nguyen to nho hon n
+  </div>
+  <div (input)="xuLy()" class="card-body">
+    <label class="form-label" for="so">Nhap n</label>
+    <input [(ngModel)]="n" class="form-control" type="text" name="so" id="so">
+  </div>
+  <div class="card-footer text-danger fw-bold">
+    Cac so nguyen to nho hon n: {{ thongBao }}
+  </div>
+</div>

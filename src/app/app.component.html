@@ -1,12 +1,21 @@
-<app-bai2-lab1></app-bai2-lab1>
-<app-bai3-lab1></app-bai3-lab1>
-<app-bai4-lab1></app-bai4-lab1>
-<app-bai5-lab1></app-bai5-lab1>
-<app-bai6-lab1></app-bai6-lab1>
-<app-bai7-lab1></app-bai7-lab1>
-<app-bai8-lab1></app-bai8-lab1>
-<app-bai9-lab1></app-bai9-lab1>
-<app-bai10-lab1></app-bai10-lab1>
-<app-bai11-lab1></app-bai11-lab1>
+<app-bai1></app-bai1>
+<app-bai2></app-bai2>
+<!-- bai3 dau -->
+<app-bai3 (event)="push($event)"></app-bai3>
+<div class="card border-top-0 rounded-top-0">
+  <div class="card-footer border-0">
+    <div *ngIf="!array.length">
+      &nbsp;
+    </div>
+    <div *ngFor="let x of array">
+      <div> {{ x }} </div>
+    </div>
+  </div>
+</div>
+<!-- bai 3 dich -->
+<app-bai4></app-bai4>
+<app-bai5></app-bai5>
+<app-bai6></app-bai6>
+<app-bai7></app-bai7>
 
 <router-outlet />
