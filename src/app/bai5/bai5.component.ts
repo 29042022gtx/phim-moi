@@ -6,41 +6,85 @@ import { Component } from '@angular/core';
   styles: ``,
 })
 export class Bai5Component {
-  thongBao: string = '\u00A0';
-  n: any = '';
-  arr: any[] = [];
+  thongBao: string = '';
+  dong: any = '';
+  cot: any = '';
+  yeuCauTongDong: boolean = true;
+  yeuCauTongCot: boolean = false;
+  twoDimArr: any[][] = [[[]]];
 
   xuLy() {
-    let n: number;
+    this.thongBao = '';
+    let dong: number;
+    let cot: number;
     try {
-      [n] = this.laySo('n');
-      if (n <= 0) {
-        throw new Error('n phai lon hon 0!');
+      [dong, cot] = this.laySo('dong', 'cot');
+      if (dong < 0 || cot < 0) {
+        throw new Error('Dong va cot phai lon bang hon 0!');
       }
     } catch (e: any) {
       this.thongBao = e.message;
+      this.twoDimArr = [[[]]];
       return;
     }
-    this.arr = this.randomAsc(n);
-    this.thongBao = '[';
-    for (let i = 0; i < this.arr.length - 1; i += 1) {
-      this.thongBao += this.arr[i] + ', ';
-    }
-    this.thongBao += this.arr.at(-1) + ']';
+    this.twoDimArr = this.randomTwoDimArr(dong, cot);
   }
 
-  randomAsc(length = 0) {
-    const arr = [];
-    arr.push(this.round(Math.random() * 10, 0))
-    for (let i = 1; i < length; i += 1) {
-      let previousVal = arr[arr.length - 1];
-      let num = this.round(Math.random() * previousVal * 1.5, 0);
-      while (num < previousVal) {
-        num = this.round(Math.random() * previousVal * 1.5, 0);
+  tongTungDong(twoDimArr: any[][]) {
+    let rows = twoDimArr.length;
+    let cols = twoDimArr[0].length;
+    let result = '';
+    for (let r = 0; r < rows; r += 1) {
+      let tong = 0;
+      for (let c = 0; c < cols; c += 1) {
+        tong += twoDimArr[r][c];
       }
+      result += tong + ' ';
+    }
+    return result;
+  }
+
+  tongTungCot(twoDimArr: any[][]) {
+    let rows = twoDimArr.length;
+    let cols = twoDimArr[0].length;
+    let result = '';
+    for (let c = 0; c < cols; c += 1) {
+      let tong = 0;
+      for (let r = 0; r < rows; r += 1) {
+        tong += twoDimArr[r][c];
+      }
+      result += tong + ' ';
+    }
+    return result;
+  }
+
+  randomTwoDimArr(rows: number, cols: number) {
+    const arr = [];
+    for (let r = 0; r < rows; r += 1) {
+      arr.push(this.randomArr(cols));
+    }
+    return arr;
+  }
+
+  randomArr(length = 0) {
+    const arr = [];
+    for (let i = 0; i < length; i += 1) {
+      let num = this.round(Math.random() * 100, 0);
       arr.push(num);
     }
     return arr;
+  }
+
+  arrToString(arr: any[]) {
+    if (arr.length == 0) {
+      return '[]';
+    }
+    let s = '[';
+    for (let i = 0; i < arr.length - 1; i += 1) {
+      s += arr[i] + ', ';
+    }
+    s += arr.at(-1) + ']';
+    return s;
   }
 
   laySo(...keys: string[]) {
@@ -101,10 +145,6 @@ export class Bai5Component {
     }
     let num = soThuc ? parseFloat(s) : parseInt(s);
     return String(num);
-  }
-
-  getFloat(s: string) {
-    return parseFloat(s);
   }
 
   round(num: number, radix: number) {

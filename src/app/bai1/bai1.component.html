@@ -1,12 +1,13 @@
-<div class="card">
-  <div class="card-header text-info fs-5 fw-bold">
-    So nguyen to nho hon n
+<form action="" class="card">
+  <div class="card-header text-info text-center fs-5 fw-bold">
+    Mang 2 chieu
   </div>
-  <div (input)="xuLy()" class="card-body">
-    <label class="form-label" for="so">Nhap n</label>
-    <input [(ngModel)]="n" class="form-control" type="text" name="so" id="so">
+  <div class="card-body">
+    <div *ngFor="let dong of twoDimArr" class="text-danger">
+      {{ arrToString(dong) }} &nbsp;
+    </div>
   </div>
   <div class="card-footer text-danger fw-bold">
-    Cac so nguyen to nho hon n: {{ thongBao }}
+    {{ thongBao }}
   </div>
-</div>
+</form>

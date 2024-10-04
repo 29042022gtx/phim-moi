@@ -6,31 +6,43 @@ import { Component } from '@angular/core';
   styles: ``,
 })
 export class Bai6Component {
-  thongBao: string = '\u00A0';
-  n: any = '';
-  arr: any[] = [];
+  thongBao: string = '';
+  dong: any = '';
+  cot: any = '';
+  twoDimArr: any[][] = [];
 
   xuLy() {
-    let n: number;
+    let dong: number;
+    let cot: number;
     try {
-      [n] = this.laySo('n');
-      if (n <= 0) {
-        throw new Error('n phai lon hon 0!');
+      [dong, cot] = this.laySo('dong', 'cot');
+      if (dong < 0 || cot < 0) {
+        throw new Error('Dong va cot phai lon bang hon 0!');
       }
     } catch (e: any) {
       this.thongBao = e.message;
-      this.arr = []
+      this.twoDimArr = [];
       return;
     }
-    this.arr = this.randomArr(n);
-    this.thongBao = 'Cac phan tu le: ';
-    const result: any[] = [];
-    for (let i = 0; i < this.arr.length; i += 1) {
-      if (this.arr[i] % 2 != 0) {
-        result.push(this.arr[i]);
-      }
+    this.twoDimArr = this.randomTwoDimArr(dong, cot);
+    this.thongBao = String(this.tongDuongCheoChinh(dong, cot));
+  }
+
+  tongDuongCheoChinh(dong: number, cot: number) {
+    let cheo = dong < cot ? dong : cot;
+    let sum = 0;
+    for (let i = 0; i < cheo; i += 1) {
+      sum += this.twoDimArr[i][i];
     }
-    this.thongBao += this.arrToString(result);
+    return sum;
+  }
+
+  randomTwoDimArr(rows: number, cols: number) {
+    const arr = [];
+    for (let r = 0; r < rows; r += 1) {
+      arr.push(this.randomArr(cols));
+    }
+    return arr;
   }
 
   randomArr(length = 0) {
@@ -48,7 +60,7 @@ export class Bai6Component {
     }
     let s = '[';
     for (let i = 0; i < arr.length - 1; i += 1) {
-        s += arr[i] + ', ';
+      s += arr[i] + ', ';
     }
     s += arr.at(-1) + ']';
     return s;
@@ -112,10 +124,6 @@ export class Bai6Component {
     }
     let num = soThuc ? parseFloat(s) : parseInt(s);
     return String(num);
-  }
-
-  getFloat(s: string) {
-    return parseFloat(s);
   }
 
   round(num: number, radix: number) {

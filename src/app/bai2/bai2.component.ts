@@ -6,32 +6,54 @@ import { Component } from '@angular/core';
   styles: ``,
 })
 export class Bai2Component {
-  n: any = 1;
-  thongBao: string = '\u00A0';
+  thongBao: string = '';
+  dong: any = '';
+  cot: any = '';
+  twoDimArr: any[][] = [];
 
   xuLy() {
-    this.thongBao = 'Cac so chinh phuong nho hon n: ';
-    let n: number;
+    let dong: number;
+    let cot: number;
     try {
-      [n] = this.laySo('n');
-      if (n <= 0) {
-        throw new Error('n phai lon hon 0!');
+      [dong, cot] = this.laySo('dong', 'cot');
+      if (dong < 0 || cot < 0) {
+        throw new Error('Dong va cot phai lon bang hon 0!');
       }
     } catch (e: any) {
       this.thongBao = e.message;
+      this.twoDimArr = [];
       return;
     }
-
-    for (let i = 1; i < n; i += 1) {
-      if (this.chinhPhuong(i)) {
-        this.thongBao += i + ' ';
-      }
-    }
+    this.twoDimArr = this.randomTwoDimArr(dong, cot);
   }
 
-  chinhPhuong(n: number) {
-    let canBac2 = Math.sqrt(n);
-    return canBac2 == Math.floor(canBac2);
+  randomTwoDimArr(rows: number, cols: number) {
+    const arr = [];
+    for (let r = 0; r < rows; r += 1) {
+      arr.push(this.randomArr(cols));
+    }
+    return arr;
+  }
+
+  randomArr(length = 0) {
+    const arr = [];
+    for (let i = 0; i < length; i += 1) {
+      let num = this.round(Math.random() * 100, 0);
+      arr.push(num);
+    }
+    return arr;
+  }
+
+  arrToString(arr: any[]) {
+    if (arr.length == 0) {
+      return '[]';
+    }
+    let s = '[';
+    for (let i = 0; i < arr.length - 1; i += 1) {
+      s += arr[i] + ', ';
+    }
+    s += arr.at(-1) + ']';
+    return s;
   }
 
   laySo(...keys: string[]) {
@@ -92,10 +114,6 @@ export class Bai2Component {
     }
     let num = soThuc ? parseFloat(s) : parseInt(s);
     return String(num);
-  }
-
-  getFloat(s: string) {
-    return parseFloat(s);
   }
 
   round(num: number, radix: number) {

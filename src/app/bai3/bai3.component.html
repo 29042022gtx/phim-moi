@@ -1,12 +1,24 @@
-<div class="card rounded-bottom-0">
-  <div class="card-header text-info fs-5 fw-bold">
-    Mang 1 chieu
+<form action="" class="card">
+  <div class="card-header text-center fs-5 fw-bold text-info">
+    Tong dong
   </div>
   <div class="card-body">
-    <label class="form-label" for="input">Nhap n</label>
-    <div class="d-flex gap-2">
-      <input [(ngModel)]="inputValue" #input name="input" id="input" class="form-control" type="text">
-      <button (click)="emit(input.value)" class="btn btn-primary">Them</button>
+    <div class="d-flex gap-3 mb-3">
+      <label class="form-label" for="dong">
+        Dong
+        <input [(ngModel)]="dong" id="dong" name="dong" class="form-control" type="text">
+      </label>
+      <label class="form-label" for="cot">
+        Cot
+        <input [(ngModel)]="cot" id="cot" name="cot" class="form-control" type="text">
+      </label>
+    </div>
+    <button (click)="xuLy()" class="btn btn-primary d-block ms-auto">Ok</button>
+    <div class="text-danger" *ngFor="let dong of twoDimArr">
+      {{ arrToString(dong) }} &nbsp;
     </div>
   </div>
-</div>
+  <div class=" card-footer text-danger fw-bold">
+    {{ thongBao }} &nbsp;
+  </div>
+</form>
