@@ -1,24 +1,23 @@
-<form action="" class="card">
-  <div class="card-header text-center text-info fs-5 fw-bold">
-    Mang ngau nhien
+<form>
+  <div class="bar">
+    <a (click)="switchTo('list')" class="list-icon"></a>
+    <a (click)="switchTo('grid')" class="grid-icon"></a>
   </div>
-  <div class="card-body">
-    <div class="d-flex gap-3 mb-3">
-      <label class="form-label" for="dong">
-        Dong
-        <input [(ngModel)]="dong" id="dong" name="dong" class="form-control" type="text">
-      </label>
-      <label class="form-label" for="cot">
-        Cot
-        <input [(ngModel)]="cot" id="cot" name="cot" class="form-control" type="text">
-      </label>
-    </div>
-    <button (click)="xuLy()" class="btn btn-primary d-block ms-auto">Ok</button>
-    <div class="text-danger" *ngFor="let dong of twoDimArr">
-      {{ arrToString(dong) }} &nbsp;
-    </div>
-  </div>
-  <div class=" card-footer text-danger fw-bold">
-    {{ thongBao }} &nbsp;
-  </div>
+  <!--Chúng ta có hai cách bố trí. Chúng tôi chọn cái nào để hiển thị tùy
+thuộc vào liên kết "bố cục" -->
+  <ul *ngIf="layout=='grid'" class="grid">
+    <!-- A view with big photos and no text -->
+    <li *ngFor="let item of articles">
+      <a :href="{{ item.url }}" target="_blank">
+        <img src="{{ item.image.large }}" />
+      </a>
+    </li>
+  </ul>
+  <ul *ngIf="layout=='list'" class="list">
+    <!-- A compact view smaller photos and titles -->
+    <li *ngFor="let item of articles">
+      <a :[href]="item.url" target="_blank"><img [src]="item.image.small" /></a>
+      <p>{{item.title}}</p>
+    </li>
+  </ul>
 </form>

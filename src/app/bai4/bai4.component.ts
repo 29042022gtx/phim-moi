@@ -1,138 +1,84 @@
 import { Component } from '@angular/core';
+import { SanPham } from './sanpham';
 
 @Component({
   selector: 'app-bai4',
   templateUrl: './bai4.component.html',
-  styles: ``,
+  styleUrl: './bai4.component.css',
 })
 export class Bai4Component {
-  thongBao: string = '';
-  dong: any = '';
-  cot: any = '';
-  twoDimArr: any[][] = [];
-
-  xuLy() {
-    let dong: number;
-    let cot: number;
-    try {
-      [dong, cot] = this.laySo('dong', 'cot');
-      if (dong < 0 || cot < 0) {
-        throw new Error('Dong va cot phai lon bang hon 0!');
+  choice: any = 'Mức giá';
+  sanpham: SanPham[] = [
+    {
+      hanghoa: 'iPhone9',
+      dongia: 700,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'Samsung',
+      dongia: 400,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'Nokia',
+      dongia: 100,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'Sony Xperia',
+      dongia: 450,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'Motorola',
+      dongia: 180,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'Oppo',
+      dongia: 600,
+      soluong: 0,
+      active: false,
+    },
+    {
+      hanghoa: 'bPhone',
+      dongia: 90,
+      soluong: 0,
+      active: false,
+    },
+  ];
+  
+  tongTien() {
+    let tong = 0;
+    this.sanpham.forEach((x) => {
+      if (x.active) {
+        tong += x.dongia * x.soluong;
       }
-    } catch (e: any) {
-      this.thongBao = e.message;
-      this.twoDimArr = [];
-      return;
-    }
-    this.twoDimArr = this.randomTwoDimArr(dong, cot);
-    this.thongBao = this.tongTungCot(this.twoDimArr);
+    })
+    return tong;
   }
 
-  tongTungCot(twoDimArr: any[][]) {
-    let rows = twoDimArr.length;
-    let cols = twoDimArr[0].length;
-    let result = '';
-    for (let c = 0; c < cols; c += 1) {
-      let tong = 0;
-      for (let r = 0; r < rows; r += 1) {
-        tong += twoDimArr[r][c];
-      }
-      result += tong + ' ';
+  filterprice() {
+    // console.log(this.choice)
+    if (this.choice == 'Mức giá') {
+      return this.sanpham;
+    } else if (this.choice < 200) {
+      return this.sanpham.filter(function (item) {
+        return item.dongia < 200;
+      });
+    } else if (this.choice > 500) {
+      return this.sanpham.filter((item) => {
+        return item.dongia > 500;
+      });
+    } else {
+      return this.sanpham.filter((item) => {
+        return item.dongia >= 200 && item.dongia <= 500;
+      });
     }
-    return result;
-  }
-
-  randomTwoDimArr(rows: number, cols: number) {
-    const arr = [];
-    for (let r = 0; r < rows; r += 1) {
-      arr.push(this.randomArr(cols));
-    }
-    return arr;
-  }
-
-  randomArr(length = 0) {
-    const arr = [];
-    for (let i = 0; i < length; i += 1) {
-      let num = this.round(Math.random() * 100, 0);
-      arr.push(num);
-    }
-    return arr;
-  }
-
-  arrToString(arr: any[]) {
-    if (arr.length == 0) {
-      return '[]';
-    }
-    let s = '[';
-    for (let i = 0; i < arr.length - 1; i += 1) {
-      s += arr[i] + ', ';
-    }
-    s += arr.at(-1) + ']';
-    return s;
-  }
-
-  laySo(...keys: string[]) {
-    this.kiemTra(...keys);
-    const result: number[] = [];
-    for (let key of keys) {
-      let val = parseFloat(String(this[key as keyof this]));
-      result.push(val);
-    }
-    return result;
-  }
-
-  kiemTra(...keys: string[]) {
-    for (let key of keys) {
-      let val = this[key as keyof this];
-      if (this.rong(val)) {
-        throw new Error('Hay nhap du du lieu!');
-      }
-    }
-    for (let key of keys) {
-      let val = this[key as keyof this];
-      if (this.khongPhaiSo(val)) {
-        throw new Error('Du lieu khong hop le!');
-      }
-    }
-  }
-
-  khongPhaiSo(...args: any[]) {
-    for (let val of args) {
-      val = parseFloat(String(val));
-      if (isNaN(val)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  rong(...args: any[]) {
-    for (let val of args) {
-      if (String(val).length == 0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  inSoThuc(s: string) {
-    return this.inSo(s, true);
-  }
-
-  inSoNguyen(s: string) {
-    return this.inSo(s, false);
-  }
-
-  inSo(s: string, soThuc: boolean) {
-    if (s.length == 0) {
-      return '';
-    }
-    let num = soThuc ? parseFloat(s) : parseInt(s);
-    return String(num);
-  }
-
-  round(num: number, radix: number) {
-    const base = Math.pow(10, radix);
-    return Math.round(num * base) / base;
   }
 }

@@ -1,13 +1,23 @@
-<form action="" class="card">
-  <div class="card-header text-info text-center fs-5 fw-bold">
-    Mang 2 chieu
+<div class="form">
+  <h1>Menu</h1>
+  <ul>
+    <!-- Lặp qua mảng services, chỉ định một trình xử lý
+  nhấp chuột và đặt hoặc
+  loại bỏ lớp css "active" -->
+    <li *ngFor="let item of services" (click)="toggleItem(item)"
+      [ngStyle]="{'background-color': item.active ? '#8ec16d' : '#e35885'}">
+      <!--Hiển thị name and price trong array .
+  filter cho formatting the price -->
+      {{item.name}}
+      <span>{{ item.price | number : '1.2' }}</span>
+    </li>
+  </ul>
+  <div class="total">
+    <!-- Tính lại total khi chọn services. Format lại
+  currency. -->
+    Total:
+    <span>
+      ${{ total() | number : '1.2' }}
+    </span>
   </div>
-  <div class="card-body">
-    <div *ngFor="let dong of twoDimArr" class="text-danger">
-      {{ arrToString(dong) }} &nbsp;
-    </div>
-  </div>
-  <div class="card-footer text-danger fw-bold">
-    {{ thongBao }}
-  </div>
-</form>
+</div>
