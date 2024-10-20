@@ -1,152 +1,237 @@
 import { Component } from '@angular/core';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+function compareDate(date1: Date, date2: Date) {
+  let year1 = date1.getFullYear();
+  let year2 = date2.getFullYear();
+  let month1 = date1.getMonth();
+  let month2 = date2.getMonth();
+  let dateOfMonth1 = date1.getDate();
+  let dateOfMonth2 = date2.getDate();
+  if (year1 > year2) {
+    return 1;
+  }
+  if (year1 < year2) {
+    return -1;
+  }
+  if (month1 > month2) {
+    return 1;
+  }
+  if (month1 < month2) {
+    return -1;
+  }
+  if (dateOfMonth1 > dateOfMonth2) {
+    return 1;
+  }
+  if (dateOfMonth1 < dateOfMonth2) {
+    return -1;
+  }
+  return 0;
+}
 
+function notFuture(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const pickDate = new Date(control.value);
+    const notFuture = compareDate(pickDate, new Date()) < 1;
+    return notFuture ? null : { notFuture: { value: control.value } };
+  };
+}
 @Component({
   selector: 'app-bai2',
   templateUrl: './bai2.component.html',
   styleUrl: './bai2.component.css',
 })
 export class Bai2Component {
-  products: any[] = [
+  employeeList: any[] = [
     {
-      id: 1,
-      name: 'Đồng hồ thụy sỹ',
-      image: 'assets/images/1001.jpg',
-      price: 1200,
-      incart: 1,
-      total: 0,
+      fullname: 'Than Tai',
+      gender: 'Nam',
+      salary: 10000000,
+      birthday: '2004-03-12',
     },
     {
-      id: 2,
-      name: 'Dell Star X',
-      image: 'assets/images/1002.jpg',
-      price: 700,
-      incart: 1,
-      total: 0,
+      fullname: 'Than Dong',
+      gender: 'Nam',
+      salary: 12000000,
+      birthday: '2002-08-23',
     },
     {
-      id: 3,
-      name: 'Sony Vaio 2017',
-      image: 'assets/images/1003.jpg',
-      price: 1700,
-      incart: 1,
-      total: 0,
+      fullname: 'Than Dang',
+      gender: 'Nam',
+      salary: 15000000,
+      birthday: '2002-09-10',
     },
     {
-      id: 4,
-      name: 'Máy ảnh Canon',
-      image: 'assets/images/1004.jpg',
-      price: 300,
-      incart: 1,
-      total: 0,
-    },
-    {
-      id: 5,
-      name: 'Vòng cưới France',
-      image: 'assets/images/1005.jpg',
-      price: 7000,
-      incart: 1,
-      total: 0,
-    },
-    {
-      id: 6,
-      name: 'Motorola thế hệ 5',
-      image: 'assets/images/1006.jpg',
-      price: 900,
-      incart: 1,
-      total: 0,
-    },
-    {
-      id: 7,
-      name: 'Mũ cao bồi Mexico',
-      image: 'assets/images/1007.jpg',
-      price: 100,
-      incart: 1,
-      total: 0,
-    },
-    {
-      id: 8,
-      name: 'Nước hoa Korea',
-      image: 'assets/images/1008.jpg',
-      price: 600,
-      incart: 1,
-      total: 0,
+      fullname: 'Tien Nu',
+      gender: 'Nu',
+      salary: 12000000,
+      birthday: '2004-11-06',
     },
   ];
-  cart: any[] = [];
-  searching: string = '';
-  tongtien: number = 0;
+  workingAge: any[] = [
+    {
+      age: 25,
+      bonus: 0.07,
+    },
+    {
+      age: 40,
+      bonus: 0.1,
+    },
+    {
+      age: 41,
+      bonus: 0.15,
+    },
+  ];
+  formEmployee = new FormGroup({
+    fullname: new FormControl<string>('', [
+      Validators.required,
+      Validators.minLength(8),
+    ]),
+    birthday: new FormControl<string>('', [Validators.required, notFuture()]),
+    gender: new FormControl<string>('Nam'),
+    salary: new FormControl<number>(7000000, [
+      Validators.required,
+      Validators.min(7000000),
+    ]),
+  });
+  updateIndex = -1;
 
-  DeleteAll() {
-    this.cart;
-    this.cart.forEach((item) => {
-      item.incart = 1;
+  constructor() {
+    this.formEmployee.controls.salary.setValue(null);
+  }
+
+  getBonusRate(age: number) {
+    let bonus = this.workingAge[0].bonus;
+    this.workingAge.some((item) => {
+      if (age < item.age) {
+        bonus = item.bonus;
+        return true;
+      }
+      return false;
     });
-    this.cart.splice(0);
+    return bonus;
   }
 
-  sumTotal() {
-    let sum = 0;
-    this.cart.forEach((item) => {
-      sum += item.incart * item.price;
+  getAge(employee: any) {
+    const today = new Date();
+    const birthday = new Date(employee.birthday);
+    let age = today.getFullYear() - birthday.getFullYear();
+    if (
+      birthday.getMonth() > today.getMonth() ||
+      (birthday.getMonth() == today.getMonth() &&
+        birthday.getDate() > today.getDate())
+    ) {
+      return age - 1;
+    }
+    return age;
+  }
+
+  getBonus(employee: any) {
+    return this.getBonusRate(this.getAge(employee)) * employee.salary;
+  }
+
+  edit(index: number) {
+    const employee = this.employeeList[index];
+    this.formEmployee.controls.fullname.setValue(employee.fullname);
+    this.formEmployee.controls.salary.setValue(employee.salary);
+    this.formEmployee.controls.gender.setValue(employee.gender);
+    this.formEmployee.controls.birthday.setValue(employee.birthday);
+    this.formEmployee.markAllAsTouched();
+    this.updateIndex = index;
+  }
+
+  update() {
+    if (this.updateIndex == -1 || this.formEmployee.invalid) {
+      return;
+    }
+    this.formEmployee.markAllAsTouched();
+    const employee = this.employeeList[this.updateIndex];
+    employee.fullname = this.formEmployee.value.fullname;
+    employee.salary = this.formEmployee.value.salary;
+    employee.gender = this.formEmployee.value.gender;
+    employee.birthday = this.formEmployee.value.birthday;
+    this.formEmployee.reset();
+    this.formEmployee.controls.gender.setValue('Nam');
+    this.updateIndex = -1;
+  }
+
+  delete(index: number) {
+    this.employeeList.splice(index, 1);
+  }
+
+  add() {
+    this.formEmployee.markAllAsTouched();
+    this.updateIndex = -1;
+    if (this.formEmployee.invalid) {
+      return;
+    }
+    this.employeeList.push({
+      fullname: this.formEmployee.value.fullname,
+      gender: this.formEmployee.value.gender,
+      salary: this.formEmployee.value.salary,
+      birthday: this.formEmployee.value.birthday,
     });
-    return sum;
+    this.formEmployee.reset();
+    this.formEmployee.controls.gender.setValue('Nam');
   }
 
-  Delete(index: number) {
-    this.cart[index].incart = 1;
-    this.cart.splice(index, 1);
-  }
-
-  decrement(index: number) {
-    this.cart[index].incart -= 1;
-  }
-
-  increment(index: number) {
-    this.cart[index].incart += 1;
-  }
-
-  itemcount() {
-    return this.cart.length;
-  }
-
-  addCart(item: any) {
-    var flag = false;
-    if (this.cart.length == 0) {
-      flag = false;
-    } else {
-      for (var i = 0; i < this.cart.length; i++) {
-        if (this.cart[i].id == item.id) {
-          flag = true;
-        }
-      }
+  switchFullname(formControl: FormControl) {
+    if (formControl.untouched && formControl.pristine) {
+      return 0;
     }
-    if (flag == false) {
-      this.cart.push(item);
-    } else {
-      for (var i = 0; i < this.cart.length; i++) {
-        if (this.cart[i].id == item.id) {
-          this.cart[i].incart++;
-        }
-      }
+    if (formControl.valid) {
+      return 1;
     }
+    const fcErrors = formControl.errors || {};
+    if ('required' in fcErrors) {
+      return 2;
+    }
+    if ('minlength' in fcErrors) {
+      return 3;
+    }
+    if ('maxlength' in fcErrors) {
+      return 4;
+    }
+    return 0;
   }
-  filterName() {
-    if (this.searching == null) {
-      return this.products;
-    } else {
-      if (this.searching) {
-        //có
-        console.log(this.searching);
-        console.log(this.searching.toUpperCase().split(' '));
-        return this.products.filter((item) => {
-          return this.searching
-            .toUpperCase()
-            .split(' ')
-            .every((v) => item.name.toUpperCase().includes(v));
-        });
-      } else {
-        return this.products;
-      }
+
+  switchSalary(formControl: FormControl) {
+    if (formControl.untouched && formControl.pristine) {
+      return 0;
     }
+    if (formControl.valid) {
+      return 1;
+    }
+    const fcErrors = formControl.errors || {};
+    if ('required' in fcErrors) {
+      return 2;
+    }
+    if ('min' in fcErrors) {
+      return 3;
+    }
+    return 0;
+  }
+
+  switchBirthday(formControl: FormControl) {
+    if (formControl.untouched && formControl.pristine) {
+      return 0;
+    }
+    if (formControl.valid) {
+      return 1;
+    }
+    const fcErrors = formControl.errors || {};
+    if ('required' in fcErrors) {
+      return 2;
+    }
+    if ('notFuture' in fcErrors) {
+      return 3;
+    }
+    return 0;
   }
 }

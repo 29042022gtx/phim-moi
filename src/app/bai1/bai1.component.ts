@@ -6,71 +6,126 @@ import { Component } from '@angular/core';
   styleUrl: './bai1.component.css',
 })
 export class Bai1Component {
+  ImgV: any[] = ['1.jpg', '2.jpg', '3.jpg', '4.jpg'];
+  Content: string =
+    'Là dòng sản phẩm có thiết kế mỏng nhẹ, sang trọng và tinhz tế cùng với đó là giá thành phải chăng nên MacBook Air đã thu hút được đông đảo người dùng yêu thích và lựa chọn. Một trong những phiên bản mới nhất mà khách hàng không thể bỏ qua khi đến với CellphoneS đó là MacBook Air M1. Dưới đây là chi tiết về thiết kế, cấu hình của máy.';
   products: any[] = [
     {
-      id: 1,
-      title: 'Macbook Pro',
-      price: 25000000,
-      qty: 1,
-      image: './assets/images/1.jpg',
+      img: '1.jpg',
+      name: 'Apple MacBook Air M1 256GB 2020 I I Chính hãng Apple Việt Nam ',
+      price: 26500,
+      rating: 3,
+      inStock: 5,
+      color: 'Đen',
+      onSale: true,
+      quality: 0,
     },
     {
-      id: 2,
-      title: 'Asus ROG',
-      price: 17000000,
-      qty: 1,
-      image: './assets/images/2.jpg',
+      img: '5.jpg',
+      name: 'Apple MacBook Air 13 256GB 2020 I I Chính hãng Apple Việt Nam ',
+      price: 29500,
+      rating: 4,
+      inStock: 3,
+      color: 'Xanh',
+      onSale: false,
+      quality: 0,
     },
     {
-      id: 3,
-      title: 'Amazon Kindle',
-      price: 15000000,
-      qty: 1,
-      image: './assets/images/3.jpg',
-    },
-    {
-      id: 4,
-      title: 'Another Product',
-      price: 18000000,
-      qty: 1,
-      image: './assets/images/4.jpg',
+      img: '6.jpg',
+      name: 'Apple MacBook Air 13 512GB 2020 I I Chính hãng Apple Việt Nam ',
+      price: 30500,
+      rating: 5,
+      inStock: 0,
+      color: 'Cam',
+      onSale: true,
+      quality: 0,
     },
   ];
-  cartItems: any[] = [];
+  selectedVariant: number = 0;
+  cart: any[] = [];
+  imgs: string = '1.jpg';
+
+  DeleteAll() {
+    this.cart = [];
+  }
+
+  Remove(i: number) {
+    this.cart.splice(i, 1);
+  }
 
   Total() {
     let sum = 0;
-    this.cartItems.forEach((item) => {
-      sum += item.price * item.qtys;
+    this.cart.forEach((productInCart) => {
+      sum += productInCart.price * productInCart.quality;
     });
     return sum;
   }
 
-  removeItem(idx: number) {
-    this.cartItems.splice(idx, 1);
-  }
-
   totalItems() {
-    return this.cartItems.length;
+    let quantity = 0;
+    this.cart.forEach((productInCart) => {
+      quantity += productInCart.quality;
+    });
+    return quantity;
   }
 
-  addToCart(itemToAdd: any) {
-    // Add the item or increase qty
-    let itemInCart = this.cartItems.filter((item) => item.id === itemToAdd.id);
-    let isItemInCart = itemInCart.length > 0;
-    if (isItemInCart === false) {
-      this.cartItems.push({
-        id: itemToAdd.id,
-        title: itemToAdd.title,
-        price: itemToAdd.price,
-        qtys: itemToAdd.qty,
-        image: itemToAdd.image,
-      });
-    } else {
-      itemInCart[0].qtys += itemToAdd.qty;
+  ChangeImage(i: number) {
+    this.imgs = this.products[i].img;
+  }
+
+  addCart(index: number) {
+    const product = this.products[index];
+    let indexInCart = -1;
+    this.cart.some((productInCart, index) => {
+      if (product.name == productInCart.name) {
+        indexInCart = index;
+        return true;
+      }
+      return false;
+    });
+    if (indexInCart == -1) {
+      this.cart.push(product);
+      this.cart[this.cart.length - 1].quality += 1;
+      this.cart[this.cart.length - 1].inStock -= 1;
+      return;
     }
-    itemToAdd.qty = 1;
-    // console.log(this.cartItems);
-    // console.log(this.products);
+    this.cart[indexInCart].quality += 1;
+    this.cart[indexInCart].inStock -= 1;
+  }
+
+  priceOnSale() {
+    const product = this.products[this.selectedVariant];
+    if (product.onSale) {
+      return product.price;
+    }
+    return product.price * 0.8;
+  }
+
+  inStock() {
+    return this.products[this.selectedVariant].inStock;
+  }
+
+  changeImg(item: string) {
+    this.imgs = item;
+  }
+
+  title() {
+    return this.products[this.selectedVariant].name;
+  }
+
+  starRating() {
+    const arr = [];
+    for (let i = 0; i < this.products[this.selectedVariant].rating; i++) {
+      arr.push(0);
+    }
+    return arr;
+  }
+
+  price() {
+    return this.products[this.selectedVariant].price;
+  }
+
+  inSale() {
+    return this.products[this.selectedVariant].onSale;
   }
 }

@@ -1,13 +1,3 @@
-img {
-  width: 100%;
-  padding: 20px;
-  }
-  .input-qty {
-  width: 60px;
-  height: 25px;
-  float: right
-  }
-  .table td,
-  th {
-  padding: 0.3rem;
-  }
+body > app-root > app-bai1 > div.row > div.col-4.text-center > img {
+  object-fit: contain;
+}
