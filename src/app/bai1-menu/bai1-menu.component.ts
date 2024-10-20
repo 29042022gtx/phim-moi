@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-bai1',
-  templateUrl: './bai1.component.html',
-  styleUrl: './bai1.component.css',
+  selector: 'app-bai1-menu',
+  templateUrl: './bai1-menu.component.html',
+  styleUrl: './bai1-menu.component.css',
 })
-export class Bai1Component {
+export class Bai1MenuComponent {
   products: any[] = [
     {
       id: 1,

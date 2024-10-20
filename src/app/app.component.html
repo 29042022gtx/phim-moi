@@ -1,8 +1,86 @@
-<div class="d-none">
-</div>
 <app-bai1></app-bai1>
 <app-bai2></app-bai2>
-<app-bai3></app-bai3>
-<app-bai4></app-bai4>
-
+<nav class="navbar navbar-expand-lg bg-dark rounded" data-bs-theme="dark">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="">
+            <i class="bi bi-house-door-fill"></i>
+            Trang chủ
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <i class="bi bi-list"></i>
+            Giới thiệu
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <i class="bi bi-telephone-fill"></i>
+            Liên hệ
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <i class="bi bi-envelope-fill"></i>
+            Góp ý
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <i class="bi bi-question-lg"></i>
+            Hỏi đáp
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-fill"></i>
+            Tài khoản
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="">Bảo mật</a></li>
+            <li><a class="dropdown-item" href="">Đăng nhập</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" href="">Tạo tài khoản</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <form *ngIf="bai == 2" class="d-flex">
+        <input type="text" [(ngModel)]="searching" name="search"
+          placeholder="Tìm sản phẩm" class="input form-control me-1 w-auto">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"
+          data-bs-toggle="modal" data-bs-target=".bd-example-modal-xl-menu">Giỏ
+          hàng: <span *ngIf="num==0">Không có</span>
+          <span *ngIf="num!=0">
+            Bạn đã mua {{num}} hàng!
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</nav>
+<div class="my-2">
+  <button (click)="bai = 1" class="btn btn-primary">
+    Bai 1
+  </button>
+  <button (click)="bai = 2" class="btn btn-primary ms-1">
+    Bai 2
+  </button>
+</div>
+<app-bai1-menu *ngIf="bai == 1; else bai2Menu"></app-bai1-menu>
+<ng-template #bai2Menu>
+  <app-bai2-menu [searching]="searching" (count)="item($event)"></app-bai2-menu>
+</ng-template>
 <router-outlet />

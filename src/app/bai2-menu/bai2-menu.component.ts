@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-bai2',
-  templateUrl: './bai2.component.html',
-  styleUrl: './bai2.component.css',
+  selector: 'app-bai2-menu',
+  templateUrl: './bai2-menu.component.html',
+  styleUrl: './bai2-menu.component.css',
 })
-export class Bai2Component {
+export class Bai2MenuComponent {
   products: any[] = [
     {
       id: 1,
@@ -73,8 +73,30 @@ export class Bai2Component {
     },
   ];
   cart: any[] = [];
-  searching: string = '';
   tongtien: number = 0;
+  @Input() searching: string = '';
+  @Output() count = new EventEmitter<number>();
+
+  emit() {
+    this.count.emit(this.itemcount());
+  }
+
+  itemcount1() {
+    let sum = 0;
+    for (let i = 0; i < this.cart.length; i++) {
+      sum += this.cart[i].incart;
+    }
+    this.count.emit(this.itemcount());
+    return sum;
+  }
+
+  itemcount() {
+    let sum = 0;
+    for (let i = 0; i < this.cart.length; i++) {
+      sum += this.cart[i].incart;
+    }
+    return sum;
+  }
 
   DeleteAll() {
     this.cart;
@@ -82,6 +104,7 @@ export class Bai2Component {
       item.incart = 1;
     });
     this.cart.splice(0);
+    this.emit()
   }
 
   sumTotal() {
@@ -95,18 +118,17 @@ export class Bai2Component {
   Delete(index: number) {
     this.cart[index].incart = 1;
     this.cart.splice(index, 1);
+    this.emit()
   }
 
   decrement(index: number) {
     this.cart[index].incart -= 1;
+    this.emit()
   }
 
   increment(index: number) {
     this.cart[index].incart += 1;
-  }
-
-  itemcount() {
-    return this.cart.length;
+    this.emit()
   }
 
   addCart(item: any) {
@@ -129,6 +151,7 @@ export class Bai2Component {
         }
       }
     }
+    this.emit()
   }
   filterName() {
     if (this.searching == null) {
