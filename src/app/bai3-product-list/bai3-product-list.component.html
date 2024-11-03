@@ -1,0 +1,158 @@
+<h1>Bai 3</h1>
+<div class="container-fluid">
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <form class="form-inline">
+        <div class="form-group">
+          <!-- <label for="">Tìm sản phẩm</label> -->
+          <input type="text" size="50" [(ngModel)]="searching"
+            (ngModelChange)="filterResults()" name="searching"
+            class="input form-control" placeholder="Tìm sản phẩm">
+        </div>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <button (click)="showAdd()" class="btn btn-primary d-block ms-auto" data-bs-toggle="modal"
+        data-bs-target="#modelId">
+        Add
+      </button>
+    </div>
+  </div>
+  <div class="row mt-3 pl-3 pr-3">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>
+            Image
+          </th>
+          <th>Product</th>
+          <th>Code</th>
+          <th>Date</th>
+          <th>Price </th>
+          <th>Description</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filterProductList; index as index">
+          <td scope="row"><img src="{{item.imageUrl}}" width="50px" alt=""
+              srcset=""> </td>
+          <td>
+            <a [routerLink]="['/bai3-product-details', item.productId]">
+              {{item.productName}}
+            </a>
+          </td>
+          <td>{{item.productCode}}</td>
+          <td>{{item.releaseDate}}</td>
+          <td>{{item.price}}</td>
+          <td>{{ item.description }}</td>
+          <td class="text-warning">
+            <app-bai1-star [rating]="item.starRating"
+              (outputRating)="showRating($event)"></app-bai1-star>
+          </td>
+          <td>
+            <button (click)="Edit(index)" class="btn btn-primary btn-sm py-0 px-1" data-bs-toggle="modal"
+              data-bs-target="#modelId">
+              Edit
+            </button>
+            <button (click)="Delete(index)" class="btn btn-danger btn-sm py-0 px-1 ms-1">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modelId" tabindex="-1" role="dialog"
+  aria-labelledby="modelTitleId" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Product</h5>
+        <button type="button-close" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="formProduct">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Product Name</label>
+                <input type="text"
+                  [formControl]="formProduct.controls.productName" name="" id=""
+                  class="form-control" placeholder="" aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Product Code</label>
+                <input type="text"
+                  [formControl]="formProduct.controls.productCode" name="" id=""
+                  class="form-control" placeholder="" aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Date</label>
+                <input type="date"
+                  [formControl]="formProduct.controls.releaseDate" name="" id=""
+                  class="form-control" placeholder="" aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">Price</label>
+                <input type="number" [formControl]="formProduct.controls.price"
+                  name="" id="" class="form-control" placeholder=""
+                  aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="">description</label>
+                <input type="text"
+                  [formControl]="formProduct.controls.description" name="" id=""
+                  class="form-control" placeholder="" aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="">picture</label>
+                <input type="file" [formControl]="formProduct.controls.imageUrl"
+                  (change)="onChange($event)" name="" id="" class="form-control"
+                  placeholder="" aria-describedby="helpId">
+                <!--<small id="helpId" class="text-muted">Helptext</small>-->
+              </div>
+            </div>
+            <div class="col-md-6">
+              <img [src]="file" width="20%" alt="">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" *ngIf="IsAdd==1"
+          (click)="Add()">
+          Add
+        </button>
+        <button type="button" class="btn btn-primary" *ngIf="IsUpdate==1"
+          (click)="Update()">
+          Update
+        </button>
+        <button type="button" class="btn btn-secondary"
+          (click)="IsAdd=1;IsUpdate=0" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
