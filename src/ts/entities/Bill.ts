@@ -1,7 +1,18 @@
-import { Pack } from './Pack';
+import { dateToString } from '../utility';
 
 export interface Bill {
   packID: string;
-  quantity: number;
-  expiredDate: string;
+  paidDate: string;
+  canceledDate: string;
+  monthQuantity: number;
+}
+
+export function createBill(packID: string, monthQuantity: number) {
+  const bill = {
+    packID,
+    paidDate: dateToString(new Date()),
+    monthQuantity,
+    canceledDate: '',
+  };
+  return bill;
 }

@@ -1,9 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppModule } from '../app.module';
-import data from '../../ts/data';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { addMonthToDate, dateToString } from '../../ts/utility';
+import {
+  addMonthToDate,
+  compareDateString,
+  dateToString,
+} from '../../ts/utility';
+import { PackService } from '../service/pack.service';
+import { Pack } from '../../ts/entities/Pack';
+import { UserService } from '../service/user.service';
+import { Bill } from '../../ts/entities/Bill';
 
 @Component({
   selector: 'app-pack-page',
@@ -13,57 +20,64 @@ import { addMonthToDate, dateToString } from '../../ts/utility';
   styleUrl: './pack-page.component.css',
 })
 export class PackPageComponent {
-  packList = data.packList.slice();
-  currentID: string = this.packList[1].id;
+  billList: Bill[] = [];
+  packList: Pack[] = [];
+  currentPackID: string = '';
   quantityControl = new FormControl('1');
 
-  constructor() {
-    if (this.isPaid()) {
-      this.currentID = data.getCurrentUser().bill.packID;
-      let quantity = data.getCurrentUser().bill.quantity;
-      this.quantityControl.setValue(String(quantity));
-      this.quantityControl.disable();
+  constructor(
+    private userService: UserService,
+    private packService: PackService
+  ) {}
+
+  ngOnInit() {
+    this.billList = this.userService.getLoggedInUser().billList;
+    this.packList = this.packService.getPackList();
+    this.currentPackID = this.packList[1].ID;
+    if (this.userService.billIsExpried()) {
+      return;
     }
+    const lastBill = this.billList.at(-1) as Bill;
+    this.currentPackID = lastBill.packID;
+    this.quantityControl.disable()
+    this.quantityControl.setValue(String(lastBill.monthQuantity));
   }
 
   getExpiredDate() {
-    if (this.isPaid()) {
-      return new Date(data.getCurrentUser().bill.expiredDate);
-    }
     return addMonthToDate(new Date(), this.getMonthQuantity());
   }
 
   cancel() {
     this.quantityControl.setValue('1');
     this.quantityControl.enable();
-    data.cancelBill();
-  }
-
-  isPaid() {
-    return data.getCurrentUser().bill.packID.length != 0;
-  }
-
-  isCurrentPack(packID: string) {
-    if (this.isPaid()) {
-      return packID == data.getCurrentUser().bill.packID;
-    }
-    return packID == this.currentID;
+    this.userService.cancelBill();
   }
 
   pay() {
-    if (!data.isLoggedIn()) {
-      return;
-    }
-    let monthQuantity = this.getMonthQuantity();
-    data.addBill(this.currentID, monthQuantity);
     this.quantityControl.disable();
+    this.userService.addBill(this.currentPackID, this.getMonthQuantity());
+  }
+
+  isPaid() {
+    return !this.userService.billIsExpried();
+  }
+
+  getPackByID(ID: string) {
+    const pack = this.packList.find((pack) => {
+      return pack.ID == ID;
+    });
+    return pack ? pack : this.packList[0];
   }
 
   choosePack(packID: string) {
     if (this.isPaid()) {
       return;
     }
-    this.currentID = packID;
+    this.currentPackID = packID;
+  }
+
+  isCurrentPack(packID: string) {
+    return packID == this.currentPackID;
   }
 
   getMonthQuantity() {
@@ -83,8 +97,12 @@ export class PackPageComponent {
 
   total() {
     let quantity = this.getMonthQuantity();
+    let currentPack = this.packList.find((pack) => {
+      return pack.ID == this.currentPackID;
+    });
+    let price = Number(currentPack?.price);
     if (quantity == 0) {
-      return this.packList[data.getPackIndex(this.currentID)].price;
+      return price;
     }
     if (quantity > 12) {
       quantity = 12;
@@ -93,7 +111,7 @@ export class PackPageComponent {
       quantity = 1;
     }
     this.quantityControl.setValue(String(quantity));
-    return this.packList[data.getPackIndex(this.currentID)].price * quantity;
+    return price * quantity;
   }
 
   onBlur() {

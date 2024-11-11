@@ -131,22 +131,38 @@ option:first-child:hover {
   -webkit-text-fill-color: var(--red);
 }
 
-.form-wrapper-valid input {
+.form-wrapper-valid input,
+.form-wrapper-valid select,
+.form-wrapper-valid textarea {
   border-color: var(--green);
 }
 
-.form-wrapper-valid input:focus {
+.form-wrapper-valid input:focus,
+.form-wrapper-valid select:focus,
+.form-wrapper-valid textarea:focus {
   border-color: var(--green);
   box-shadow: 0 0 0px 1000px #ffffff inset, 0 0 0 0.25rem var(--lightgreen);
 }
 
-.form-wrapper-invalid input {
+.form-wrapper-invalid input,
+.form-wrapper-invalid select,
+.form-wrapper-invalid textarea {
   border-color: var(--red);
 }
 
-.form-wrapper-invalid input:focus {
+.form-wrapper-invalid input:focus,
+.form-wrapper-invalid select:focus,
+.form-wrapper-invalid textarea:focus {
   border-color: var(--red);
   box-shadow: 0 0 0px 1000px #ffffff inset, 0 0 0 0.25rem var(--lightred);
+}
+
+.btn-warning:focus-visible {
+  color: white;
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--gold);
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem var(--neonyellow);
 }
 
 .nav-link {

@@ -1,8 +1,10 @@
 import { querySelectorAll } from './utility';
 
-function run() {
+function run(document: Document) {
   const selectWrapperList = Array.from(
-    querySelectorAll('.custom-select-wrapper') as NodeListOf<HTMLElement>
+    document.querySelectorAll(
+      '.custom-select-wrapper'
+    ) as NodeListOf<HTMLElement>
   );
   selectWrapperList.forEach((selectWrapper) => {
     const select = selectWrapper.querySelector('select') as HTMLSelectElement;

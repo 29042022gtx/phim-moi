@@ -42,53 +42,47 @@
   </div>
 
   <!-- phim -->
-  <main class="mt-3 ms-2">
-    <form action="" class="head d-flex gap-1 my-3">
-      <div class="ms-auto custom-select-wrapper">
-        <select id="sort" class="form-select">
-          <option value="">
-            Sắp xếp
-          </option>
-          <option value="">
-            Mới nhất
-          </option>
-          <option value="">
-            Xem nhiều
-          </option>
-        </select>
-      </div>
-      <div class="custom-select-wrapper">
-        <select id="category" class="form-select">
-          <option value="">
-            Thể loại
-          </option>
-          <option value="Hành động">
-            Hành động
-          </option>
-          <option value="Tình cảm">
-            Tình Cảm
-          </option>
-          <option value="Hoạt hình">
-            Hoạt hình
-          </option>
-        </select>
-      </div>
-      <div class="input-group w-auto">
-        <input type="text" id="search" class="form-control"
-          placeholder="Từ khóa" style="max-width: 16em;">
-        <button type="submit" value="Tìm" class="btn btn-light border">
-          <i class="bi bi-search"></i>
-        </button>
-      </div>
-      <button class="btn btn-warning">
-        <i class="bi bi-bookmark-star"></i>
+  <form action="" class="d-flex gap-1 flex-wrap my-3">
+    <div class="ms-auto custom-select-wrapper">
+      <select id="sort" class="form-select" (change)="sortByDate()">
+        <option value="">Sắp xếp</option>
+        <option value="latest" (click)="sortByDate()">Mới nhất</option>
+        <option value="mostViewed" (click)="sortByViews()">Xem nhiều</option>
+      </select>
+    </div>
+    <div class="custom-select-wrapper">
+      <select id="category" name="kjghb" class="form-select"
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="filterByCategory($event)">
+        <option value="">Thể loại</option>
+        <option value="Hành động">Hành động</option>
+        <option value="Tình cảm">Tình Cảm</option>
+        <option value="Hoạt hình">Hoạt hình</option>
+        <option value="Giả tưởng">Giả tưởng</option>
+        <option value="Phiêu lưu">Phiêu lưu</option>
+      </select>
+    </div>
+    <div class="input-group w-auto">
+      <input (input)="filterResults()" type="text" size="50"
+        [(ngModel)]="searching" name="searching" class="input form-control"
+        placeholder="Tìm sản phẩm" style="max-width: 16em;">
+      <!--  -->
+      <button type="submit" value="Tìm" class="btn btn-light border">
+        <i class="bi bi-search"></i>
       </button>
-    </form>
-    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4">
-      <div *ngFor="let movie of movies; index as idx" class="col">
+    </div>
+    <button class="btn btn-warning" data-bs-toggle="modal"
+      data-bs-target="#favouriteList">
+      <i class="bi bi-bookmark-star"></i>
+    </button>
+  </form>
+  <main class="my-3 container-fluid">
+    <!-- Pop up trailer -->
+    <div class="row row-cols-2 row-cols-md-4">
+      <div *ngFor="let movie of getMovieList(); index as idx" class="col">
         <div class="card-body" (mouseenter)="currentIdx = idx"
           (mouseleave)="currentIdx = -1">
-          <a href="">
+          <a [routerLink]="['/movie-detail', movie.ID]">
             <img [src]="movie.imgURL" class="d-block w-100 rounded-3"
               alt="{{ movie.name }}">
             <p class="text-center"><b>{{ movie.name }}</b></p>
@@ -100,16 +94,18 @@
               <div class="movie-name fs-5"><b>{{ movie.name }}</b>
               </div>
               <div class="info-bottom d-flex gap-1 mb-1">
-                <a href=""
+                <a [routerLink]="['/movie-detail', movie.ID]"
                   class="ms-0 btn btn-sm btn-outline-light rounded-0 text-bg-light">
                   <i class="bi bi-play"></i>
                   Xem ngay
                 </a>
-                <a href="" class="btn btn-sm btn-outline-light rounded-0">
+                <button (click)="addToFavourite(movie.ID)"
+                  class="btn btn-sm btn-outline-light rounded-0">
                   <i class="bi bi-plus"></i>
                   Yêu thích
-                </a>
-                <a href="" class="btn btn-sm btn-outline-light rounded-0">
+                </button>
+                <a [routerLink]="['/movie-detail', movie.ID]"
+                  class="btn btn-sm btn-outline-light rounded-0">
                   <i class="bi bi-info-circle"></i>
                   Chi tiết</a>
               </div>
@@ -123,15 +119,69 @@
       </div>
     </div>
     <!-- Phân trang -->
-    <nav aria-label="">
+    <nav>
       <ul class="pagination justify-content-center">
-        <li class="page-item active" aria-current="page">
-          <span class="page-link">1</span>
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="goToPage(currentPage - 1)"
+            aria-label="Previous">&laquo;</button>
         </li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"
+          *ngFor="let page of [].constructor(getTotalPages()); let i = index"
+          [class.active]="currentPage === i + 1">
+          <button class="page-link" (click)="goToPage(i + 1)">
+            {{ i + 1 }}
+          </button>
+        </li>
+        <li class="page-item"
+          [class.disabled]="currentPage === getTotalPages()">
+          <button class="page-link" (click)="goToPage(currentPage + 1)"
+            aria-label="Next">&raquo;</button>
+        </li>
       </ul>
     </nav>
   </main>
+
+  <!-- modal -->
+  <div class="modal fade" id="favouriteList" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 text-center" id="staticBackdropLabel">
+            Yêu thích
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngFor="let movie of getFavouriteList()"
+            class="d-flex gap-2 align-items-center mb-2">
+            <img src="{{ movie.imgURL }}" alt="" style="height: 4em;">
+            <div>
+              <div>
+                <a routerLink="/movie-detail/{{ movie.ID }}"
+                  data-bs-dismiss="modal">
+                  <b>
+                    {{ movie.name }}
+                  </b>
+                </a>
+              </div>
+              <div>
+                <a routerLink="/movie-detail/{{ movie.ID }}"
+                  data-bs-dismiss="modal"
+                  class="btn btn-sm btn-warning me-1 py-0 px-1">
+                  Xem
+                </a>
+                <button (click)="removeFavourite(movie.ID)"
+                  class="btn btn-sm btn-danger me-1 py-0 px-1">
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <app-footer></app-footer>

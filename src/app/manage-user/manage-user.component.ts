@@ -1,28 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { AppModule } from '../app.module';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, Inject } from '@angular/core';
 import {
   FormGroup,
-  Validators,
   FormControl,
-  FormsModule,
-  ReactiveFormsModule,
+  Validators,
   AbstractControl,
   ValidationErrors,
+  ReactiveFormsModule,
 } from '@angular/forms';
+import { createUser, User } from '../../ts/entities/User';
 import { validatorList } from '../../ts/validatorList';
-import { createUser } from '../../ts/entities/User';
+import { MovieService } from '../service/movie.service';
 import { UserService } from '../service/user.service';
 
 @Component({
-  selector: 'app-account-page',
+  selector: 'app-manage-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppModule],
-  templateUrl: './account-page.component.html',
-  styleUrl: './account-page.component.css',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './manage-user.component.html',
+  styleUrl: './manage-user.component.css',
 })
-export class AccountPageComponent implements OnInit {
-  form = new FormGroup({
+export class ManageUserComponent {
+  userForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     username: new FormControl('', [
       Validators.required,
@@ -44,16 +43,21 @@ export class AccountPageComponent implements OnInit {
     ]),
     confirmPassword: new FormControl('', [Validators.required]),
   });
-  submitted = true;
+  userFormSubmitted = true;
   currentUser = createUser();
-  message = '';
+  userFormMessage = '';
+  userList: User[] = [];
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private movieService: MovieService,
+    @Inject(DOCUMENT) private document: Document
+  ) {
     this.currentUser = this.userService.getLoggedInUser() || createUser();
-    this.form.controls.confirmPassword.addValidators(
-      validatorList.isSamePassword(this.form.controls.password)
+    this.userForm.controls.confirmPassword.addValidators(
+      validatorList.isSamePassword(this.userForm.controls.password)
     );
-    this.form.controls.username.addValidators([
+    this.userForm.controls.username.addValidators([
       (control: AbstractControl): ValidationErrors | null => {
         return !this.userService.usernameExistedExcept(
           control.value,
@@ -63,7 +67,7 @@ export class AccountPageComponent implements OnInit {
           : { isUnique: { value: control.value } };
       },
     ]);
-    this.form.controls.email.addValidators([
+    this.userForm.controls.email.addValidators([
       (control: AbstractControl): ValidationErrors | null => {
         return !this.userService.emailExistedExcept(
           control.value,
@@ -73,42 +77,28 @@ export class AccountPageComponent implements OnInit {
           : { isUnique: { value: control.value } };
       },
     ]);
-    this.form.controls.name.setValue(this.currentUser.name);
-    this.form.controls.username.setValue(this.currentUser.username);
-    this.form.controls.email.setValue(this.currentUser.email);
-    this.form.controls.phone.setValue(this.currentUser.phone);
-    this.form.controls.password.setValue(this.currentUser.password);
-    this.form.controls.confirmPassword.setValue(this.currentUser.password);
+    this.userForm.controls.name.setValue(this.currentUser.name);
+    this.userForm.controls.username.setValue(this.currentUser.username);
+    this.userForm.controls.email.setValue(this.currentUser.email);
+    this.userForm.controls.phone.setValue(this.currentUser.phone);
+    this.userForm.controls.password.setValue(this.currentUser.password);
+    this.userForm.controls.confirmPassword.setValue(this.currentUser.password);
   }
 
-  ngOnInit(): void {}
-
-  edit() {
-    this.message = '';
-  }
-
-  onInput() {
-    this.message = '';
-  }
-
-  isInvalidFormControl(formControl: FormControl) {
-    return formControl.dirty && formControl.invalid;
-  }
-
-  isValidFormControl(formControl: FormControl) {
-    return formControl.pristine || formControl.valid;
+  ngOnInit(): void {
+    this.userList = this.userService.getUserList();
   }
 
   submit() {
-    this.submitted = true;
-    if (this.form.invalid) {
+    this.userFormSubmitted = true;
+    if (this.userForm.invalid) {
       return;
     }
-    let name = this.form.value.name as string;
-    let username = this.form.value.username as string;
-    let email = this.form.value.email as string;
-    let phone = this.form.value.phone as string;
-    let password = this.form.value.password as string;
+    let name = this.userForm.value.name as string;
+    let username = this.userForm.value.username as string;
+    let email = this.userForm.value.email as string;
+    let phone = this.userForm.value.phone as string;
+    let password = this.userForm.value.password as string;
     this.userService.updateUser(
       name,
       username,
@@ -116,11 +106,11 @@ export class AccountPageComponent implements OnInit {
       phone,
       password
     );
-    this.message = 'Cập nhật thành công';
+    this.userFormMessage = 'Cập nhật thành công';
   }
 
   getEmailWrapperClass(formControl: FormControl) {
-    if (formControl.pristine && !this.submitted) {
+    if (formControl.pristine && !this.userFormSubmitted) {
       return 'form-wrapper-default form-wrapper-0';
     }
     const controlErrors = formControl.errors;
@@ -138,7 +128,7 @@ export class AccountPageComponent implements OnInit {
   }
 
   getUsernameWrapperClass(formControl: FormControl) {
-    if (formControl.pristine && !this.submitted) {
+    if (formControl.pristine && !this.userFormSubmitted) {
       return 'form-wrapper-default form-wrapper-0';
     }
     const controlErrors = formControl.errors || {};
@@ -153,7 +143,7 @@ export class AccountPageComponent implements OnInit {
   }
 
   getPasswordWrapperClass(formControl: FormControl) {
-    if (formControl.pristine && !this.submitted) {
+    if (formControl.pristine && !this.userFormSubmitted) {
       return 'form-wrapper-default form-wrapper-0';
     }
     const controlErrors = formControl.errors || {};
@@ -174,7 +164,7 @@ export class AccountPageComponent implements OnInit {
   }
 
   getInputWrapperClass(formControl: FormControl) {
-    if (formControl.pristine && !this.submitted) {
+    if (formControl.pristine) {
       return 'form-wrapper-default';
     }
     if (formControl.valid) {

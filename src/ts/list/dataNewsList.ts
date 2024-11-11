@@ -1,6 +1,6 @@
-import { News } from './entities/News';
+import { News } from '../entities/News';
 
-const newsList: News[] = [
+const dataNewsList: News[] = [
   {
     title: 'Ưu Đãi Xa Xỉ',
     content:
@@ -83,4 +83,4 @@ const newsList: News[] = [
   },
 ];
 
-export default newsList;
+export default dataNewsList;

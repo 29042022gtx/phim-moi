@@ -6,6 +6,18 @@
   position: relative;
 }
 
+.row {
+  overflow: hidden;
+  transition-delay: 0.5s;
+  transition-duration: 0s;
+  transition: overflow 0s 0.5s allow-discrete;
+}
+
+.row:hover {
+  transition-delay: 0s;
+  overflow: visible;
+}
+
 .info-box {
   position: absolute;
   background-color: black;

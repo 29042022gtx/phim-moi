@@ -1,97 +1,26 @@
-import { addMonthToDate, dateToString } from './utility';
-import { User } from './entities/User';
-import { Pack } from './entities/Pack';
-import movieList from './movieList';
-import newsList from './newsList';
+import { createUser, User } from './entities/User';
+import dataMovieList from './list/dataMovieList';
+import dataNewsList from './list/dataNewsList';
+import dataUserList from './list/dataUserList';
+import dataPackList from './list/dataPackList';
 
 class Data {
   currentUserIndex: number = -1;
-  movieList = movieList;
-  newsList = newsList;
-  packList: Pack[] = [
-    {
-      id: 'pack1',
-      name: 'Cơ bản',
-      price: 50000,
-      limit: 10,
-      description: '10 phim thịnh hành',
-    },
-    {
-      id: 'pack2',
-      name: 'Tiêu chuẩn',
-      price: 75000,
-      limit: 20,
-      description: '20 phim mới nhất',
-    },
-    {
-      id: 'pack3',
-      name: 'Cao cấp',
-      price: 80000,
-      limit: NaN,
-      description: 'Kho phim bất tận',
-    },
-  ];
-  userList: User[] = [
-    {
-      name: 'admin',
-      username: 'admin',
-      password: '12345678a*',
-      email: 'admin@gmail.com',
-      phone: '0123456789',
-      bill: {
-        packID: '',
-        quantity: 0,
-        expiredDate: '2000-01-01',
-      },
-    },
-    {
-      name: 'User 01',
-      username: 'user01',
-      password: '12345678a*',
-      email: 'user01@gmail.com',
-      phone: '0123456789',
-      bill: {
-        packID: '',
-        quantity: 0,
-        expiredDate: '2000-01-01',
-      },
-    },
-  ];
+  movieList = dataMovieList;
+  newsList = dataNewsList;
+  packList = dataPackList;
+  userList = dataUserList;
 
-  cancelBill() {
-    if (!this.isLoggedIn) {
+  updateUser(user: User) {
+    if (!this.isLoggedIn()) {
       return;
     }
-    this.getCurrentUser().bill.packID = '';
+    this.userList.splice(this.currentUserIndex, 1, user);
     this.saveData();
-  }
-
-  addBill(id: string, monthQuantity: number) {
-    if (!this.isLoggedIn) {
-      return;
-    }
-    this.getCurrentUser().bill = {
-      packID: id,
-      quantity: monthQuantity,
-      expiredDate: dateToString(addMonthToDate(new Date(), monthQuantity)),
-    };
-    this.saveData();
-  }
-
-  getPackIndex(id: string) {
-    let idx = -1;
-    this.packList.some((pack, index) => {
-      if (pack.id != id) {
-        return false;
-      }
-      idx = index;
-      return true;
-    });
-    return idx;
   }
 
   addUser(name = '', username = '', email = '', phone = '', password = '') {
-    this.userList.push(this.createUser(name, username, email, phone, password));
+    this.userList.push(createUser(name, username, email, phone, password));
     this.saveData();
   }
 
@@ -102,7 +31,7 @@ class Data {
 
   logIn(username: string, password: string) {
     this.currentUserIndex = -1;
-    this.userList.some((user: User, index) => {
+    this.userList.some((user: User, index: number) => {
       if (!(user.username == username && user.password == password)) {
         return false;
       }
@@ -121,7 +50,7 @@ class Data {
 
   getCurrentUser() {
     if (!this.isLoggedIn()) {
-      return this.createUser();
+      return createUser();
     }
     return this.userList[this.currentUserIndex];
   }
@@ -133,35 +62,13 @@ class Data {
   }
 
   saveData() {
-    localStorage.setItem('data', JSON.stringify(this));
-  }
-
-  private createUser(
-    name = '',
-    username = '',
-    email = '',
-    phone = '',
-    password = ''
-  ) {
-    const user: User = {
-      name,
-      username,
-      email,
-      phone,
-      password,
-      bill: {
-        packID: '',
-        quantity: 0,
-        expiredDate: '',
-      },
-    };
-    return user;
+    localStorage.setItem('dataNhom2HIL', JSON.stringify(this));
   }
 }
 
 function getData() {
   if (typeof window !== 'undefined' && window.localStorage) {
-    const stringData = localStorage.getItem('data');
+    const stringData = localStorage.getItem('dataNhom2HIL');
     if (stringData != null) {
       const data = Object.setPrototypeOf(
         JSON.parse(stringData),

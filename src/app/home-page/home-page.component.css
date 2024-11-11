@@ -1,5 +1,5 @@
 .features {
-  margin-bottom: 0.5em;
+  margin: 0.5em 0;
 }
 
 .features img:hover {
@@ -11,9 +11,6 @@
   background-image: url(/assets/img/background.jpg);
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-.slides .content-wrapper {
   padding: 2.5em;
 }
 
@@ -78,6 +75,7 @@
 .movies-item {
   display: block;
   position: relative;
+  overflow: hidden;
 }
 
 .movies-item-info {

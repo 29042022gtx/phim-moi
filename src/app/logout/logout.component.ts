@@ -1,20 +1,32 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import data from '../../ts/data';
+import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
+import { UserService } from '../service/user.service';
 
 @Component({
   selector: 'app-logout',
   templateUrl: './logout.component.html',
   styleUrl: './logout.component.css',
 })
-export class LogoutComponent {
+export class LogoutComponent implements OnInit {
   @Output() loggedOut = new EventEmitter<number>();
-  data = data;
 
-  constructor(private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    @Inject(DOCUMENT) private document: Document
+  ) {}
+
+  ngOnInit(): void {
+    const modal = this.document.querySelector('#logout') as HTMLElement;
+    const subminBTN = this.document.querySelector('#subminBTN') as HTMLElement;
+    modal.addEventListener('shown.bs.modal', () => {
+      subminBTN.focus();
+    });
+  }
 
   onSubmit() {
-    data.logOut();
+    this.userService.logOut();
     this.loggedOut.emit();
     this.router.navigateByUrl('login-page');
   }

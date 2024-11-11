@@ -6,15 +6,25 @@ import {
   FormControl,
   FormsModule,
   ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
 import { AppModule } from '../app.module';
 import { validatorList } from '../../ts/validatorList';
-import data from '../../ts/data';
+import { RouterLink } from '@angular/router';
+import { UserService } from '../service/user.service';
+import { ManageService } from '../service/manage.service';
 
 @Component({
   selector: 'app-sign-up-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, AppModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AppModule,
+    RouterLink,
+  ],
   templateUrl: './sign-up-page.component.html',
   styleUrl: './sign-up-page.component.css',
 })
@@ -24,13 +34,8 @@ export class SignUpPageComponent {
     username: new FormControl('', [
       Validators.required,
       Validators.minLength(6),
-      validatorList.isUnique(this.getUsernameList()),
     ]),
-    email: new FormControl('', [
-      Validators.required,
-      Validators.email,
-      validatorList.isUnique(this.getEmailList()),
-    ]),
+    email: new FormControl('', [Validators.required, Validators.email]),
     phone: new FormControl('', [
       Validators.required,
       Validators.minLength(10),
@@ -55,7 +60,24 @@ export class SignUpPageComponent {
   submitted = false;
   message = '';
 
-  constructor() {
+  constructor(
+    private userService: UserService,
+    private manageService: ManageService
+  ) {
+    this.form.controls.username.addValidators([
+      (control: AbstractControl): ValidationErrors | null => {
+        return !this.userService.usernameExisted(control.value)
+          ? null
+          : { isUnique: { value: control.value } };
+      },
+    ]);
+    this.form.controls.email.addValidators([
+      (control: AbstractControl): ValidationErrors | null => {
+        return !this.userService.emailExisted(control.value)
+          ? null
+          : { isUnique: { value: control.value } };
+      },
+    ]);
     this.form.controls.confirmPassword.addValidators(
       validatorList.isSamePassword(this.form.controls.password)
     );
@@ -83,24 +105,8 @@ export class SignUpPageComponent {
     let email = this.form.value.email as string;
     let phone = this.form.value.phone as string;
     let password = this.form.value.password as string;
-    data.addUser(name, username, email, phone, password);
+    this.manageService.addUser(name, username, email, phone, password);
     this.message = 'Đã đăng kí tài khoản!';
-  }
-
-  getEmailList() {
-    const emailList: any[] = [];
-    data.userList.forEach((user) => {
-      emailList.push(user.email);
-    });
-    return emailList;
-  }
-
-  getUsernameList() {
-    const usernameList: any[] = [];
-    data.userList.forEach((user) => {
-      usernameList.push(user.username);
-    });
-    return usernameList;
   }
 
   getEmailWrapperClass(formControl: FormControl) {

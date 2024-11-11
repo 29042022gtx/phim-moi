@@ -3,16 +3,21 @@ th {
   padding: 4px 8px;
 }
 
+.table td,
+.table th {
+  background-color: transparent;
+}
+
 .item {
-  border: 1px solid #ccc;
-  padding: 15px;
-  position: relative;
   cursor: pointer;
 }
 
 .item .infor-item {
   display: none;
-  margin-top: 10px;
+}
+
+.item:hover .infor-item {
+  display: block;
 }
 
 .infor-item p {
@@ -21,10 +26,6 @@ th {
 
 .infor-item span {
   font-weight: normal;
-}
-
-.item:hover .infor-item {
-  display: block;
 }
 
 .position-absolute {

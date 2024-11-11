@@ -1,15 +1,21 @@
 <app-header></app-header>
 
 <div class="content-wrapper">
-  <h4 class="title text-center fw-bold my-3">
+  <h4 class="title text-center fw-bold my-3 position-relative">
     Các gói phim
+    <button type="button" class="btn btn-warning position-absolute end-0"
+      data-bs-toggle="modal" data-bs-target="#billList">
+      <i class="bi bi-clock-history"></i>
+      Lịch sử
+    </button>
   </h4>
+
   <div class="container-md">
     <div class="row row-cols-1 row-cols-md-3 g-2">
       <div *ngFor="let pack of packList; index as idx" class="col">
-        <button [disabled]="isPaid() && !isCurrentPack(pack.id)"
-          (click)="choosePack(pack.id)"
-          [ngClass]="isCurrentPack(pack.id) ? 'focus' : ''"
+        <button [disabled]="isPaid() && !isCurrentPack(pack.ID)"
+          (click)="choosePack(pack.ID)"
+          [ngClass]="isCurrentPack(pack.ID) ? 'focus' : ''"
           class="pack border rounded-1 w-100 p-0">
           <div class="name card-img-top" style="aspect-ratio: 2/1;">
             {{ pack.name }}
@@ -18,21 +24,15 @@
             <div class="m-auto mt-1 text-center">
               {{ pack.price | currency: 'VND' }}
             </div>
-            <div>
-              {{ pack.description }}
-            </div>
-            <div>
-              Lorem ipsum dolor {{ idx }}
-            </div>
-            <div>
-              Lorem ipsum dolor sit
+            <div *ngFor="let item of pack.description">
+              {{ item }}
             </div>
           </div>
         </button>
       </div>
     </div>
   </div>
-  <form (submit)="pay()" action="" class="mt-3 ms-auto"
+  <form (submit)="pay()" action="" class="mt-3 ms-auto px-3"
     style="max-width: 20em;">
     <div class="d-flex align-items-center">
       Số tháng:
@@ -41,7 +41,7 @@
         class="ms-auto form-control" placeholder="">
     </div>
     <div class="d-flex align-items-center">
-      Đến ngày: 
+      Đến ngày:
       <div class="ms-auto">
         {{ getExpiredDate() | date:'dd/MM/y' }}
       </div>
@@ -50,7 +50,8 @@
       <div class="me-auto">
         Tổng tiền: {{ total() | currency: 'VND' }}
       </div>
-      <button *ngIf="isPaid()" (click)="cancel()" type="button" class="btn btn-danger ms-1">
+      <button *ngIf="isPaid()" (click)="cancel()" type="button"
+        class="btn btn-danger ms-1">
         Hủy gói
       </button>
       <button *ngIf="!isPaid()" class="ms-1 btn btn-warning text-white">
@@ -67,6 +68,66 @@
       </span>
     </div>
   </form>
+</div>
+
+<!-- modal -->
+<div class="modal fade" id="billList" tabindex="-1"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Hóa đơn
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngFor="let bill of billList" class="d-flex gap-2 mb-2">
+          <ng-container *ngFor="let pack of [getPackByID(bill.packID)]">
+            <div class="d-flex align-items-center justify-content-center text-white p-2"
+              style="background-color: var(--gold); min-width: 6em;">
+              {{ pack.name }}
+            </div>
+            <div>
+              <div>
+                <b>
+                  Ngày mua: 
+                </b>
+                {{ bill.paidDate | date : 'dd/MM/y' }}
+              </div>
+              <div>
+                <b>
+                  Số tháng:
+                </b>
+                {{ bill.monthQuantity }}
+              </div>
+              <div>
+                <b>
+                  Thành tiền:
+                </b>
+                {{ pack.price * bill.monthQuantity | currency: 'VND' }}
+              </div>
+              <div>
+                <b>
+                  Ghi chú:
+                </b>
+                <span *ngIf="bill.canceledDate.length != 0">
+                  Hủy ngày
+                  {{ bill.canceledDate | date : 'dd/MM/y' }}
+                </span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <app-footer></app-footer>

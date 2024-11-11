@@ -7,6 +7,7 @@ import { PackPageComponent } from './pack-page/pack-page.component';
 import { AccountPageComponent } from './account-page/account-page.component';
 import { ManagePageComponent } from './manage-page/manage-page.component';
 import { NewsPageComponent } from './news-page/news-page.component';
+import { MovieDetailComponent } from './movie-detail/movie-detail.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,10 @@ export const routes: Routes = [
   {
     path: 'movie-page',
     component: MoviePageComponent,
+  },
+  {
+    path: 'movie-detail/:ID',
+    component: MovieDetailComponent,
   },
   {
     path: 'news-page',

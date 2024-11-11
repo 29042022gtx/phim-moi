@@ -3,26 +3,18 @@
   <h4 class="title text-center fw-bold my-3">
     Khuyến mãi hot
   </h4>
-  <section class="py-2 mb-2">
-    <form action="" class="d-flex gap-1">
-      <div class="custom-select-wrapper">
-        <select id="category" class="form-select">
-          <option value="" class="active"> Tất cả</option>
-          <option value="">Preview</option>
-          <option value="">Review</option>
-        </select>
-      </div>
-      <div class="custom-select-wrapper">
-        <select id="sort" class="form-select">
-          <option value="">Mới nhất</option>
-          <option value="">Xem nhiều nhất</option>
-          <option value="">Đánh giá tốt nhất</option>
-        </select>
-      </div>
-    </form>
-  </section>
+  <form action="" class="d-flex gap-1 mb-2 p-2">
+    <div class="custom-select-wrapper">
+      <select id="sort" class="form-select" (change)="onSortChange($event)">
+        <option value="newest">Mới nhất</option>
+        <option value="mostViewed">Xem nhiều nhất</option>
+        <option value="bestRated">Đánh giá tốt nhất</option>
+      </select>
+    </div>
+  </form>
+
   <div class="card border-0">
-    <div class="card-body d-flex" *ngFor="let news of newsList">
+    <div *ngFor="let news of getNewsList()" class="card-body d-flex">
       <div class="col-4 d-flex align-items-center">
         <img [src]="news.imgURL" alt="">
       </div>
@@ -38,5 +30,28 @@
       </div>
     </div>
   </div>
+
+  <!-- Pagination -->
+  <nav aria-label="">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link"
+          (click)="goToPage(currentPage - 1); $event.preventDefault()"
+          aria-label="Previous">&laquo;</a>
+      </li>
+      <li class="page-item"
+        *ngFor="let page of [].constructor(getTotalPages()); let i = index"
+        [class.active]="currentPage === i + 1">
+        <a class="page-link" (click)="goToPage(i + 1); $event.preventDefault()">
+          {{ i + 1 }}
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+        <a class="page-link"
+          (click)="goToPage(currentPage + 1); $event.preventDefault()"
+          aria-label="Next">&raquo;</a>
+      </li>
+    </ul>
+  </nav>
 </div>
 <app-footer></app-footer>

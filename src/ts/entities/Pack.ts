@@ -1,7 +1,6 @@
 export interface Pack {
-  id: string;
+  ID: string;
   name: string;
   price: number;
-  limit: number;
-  description: string;
+  description: string[];
 }

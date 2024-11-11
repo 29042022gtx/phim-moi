@@ -1,5 +1,5 @@
 <form [formGroup]="form" (input)="onInput()" action="" class="modal1 fade1"
-  id="signUp" tabindex="-1" aria-labelledby="signUp" aria-hidden="true">
+  id="signUp" tabindex="-1" aria-labelledby="signUp">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -160,18 +160,6 @@
           </label>
         </div>
 
-        <!-- <div class="position-relative mb-3">
-          <div class="form-select invisible">
-            <option value=""></option>
-          </div>
-          <select id="area" class="position-absolute top-0 form-select">
-            <option value="" selected>Chọn khu vực</option>
-            <option value=" Bac">Miền Bắc</option>
-            <option value="Trung">Miền Trung</option>
-            <option value="Name">Miền Nam</option>
-          </select>
-        </div> -->
-
         <button (click)="submit()" type="submit"
           class="mb-3 d-block w-100 btn btn-warning text-white"
           data-bs-dismiss="modal1">
@@ -184,10 +172,10 @@
           {{ message }}
         </div>
         <div>
-          <a href="" class="link-warning">
+          <a class="link-warning" routerLink="/">
             Trang chủ
           </a>
-          <a class="ms-1 link-warning" href="login-page">
+          <a class="ms-1 link-warning" routerLink="/login-page">
             Đăng nhập
           </a>
         </div>
