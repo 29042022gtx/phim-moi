@@ -13,6 +13,7 @@ import {
 import { validatorList } from '../../ts/validatorList';
 import { createUser } from '../../ts/entities/User';
 import { UserService } from '../service/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-account-page',
@@ -42,13 +43,18 @@ export class AccountPageComponent implements OnInit {
       validatorList.containsDigit(),
       validatorList.containsSpecialChar(),
     ]),
-    confirmPassword: new FormControl('', [Validators.required]),
+    confirmPassword: new FormControl('', [
+      Validators.minLength(8),
+      validatorList.containsLetter(),
+      validatorList.containsDigit(),
+      validatorList.containsSpecialChar(),
+    ]),
   });
   submitted = true;
   currentUser = createUser();
   message = '';
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private router: Router) {
     this.currentUser = this.userService.getLoggedInUser() || createUser();
     this.form.controls.confirmPassword.addValidators(
       validatorList.isSamePassword(this.form.controls.password)
@@ -81,7 +87,21 @@ export class AccountPageComponent implements OnInit {
     this.form.controls.confirmPassword.setValue(this.currentUser.password);
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    if (!this.userService.isLoggedIn()) {
+      alert('Vui lòng đăng nhập!');
+      this.router.navigateByUrl('/login-page');
+    }
+    if (this.userService.isLocked()) {
+      alert('Tài khoản đã bị khóa');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (this.userService.isAdmin()) {
+      this.router.navigateByUrl('/manage-page');
+      return;
+    }
+  }
 
   edit() {
     this.message = '';
@@ -101,21 +121,21 @@ export class AccountPageComponent implements OnInit {
 
   submit() {
     this.submitted = true;
+    this.message = '';
+    if (this.form.pristine) {
+      alert('Chưa có thay đổi!');
+      return;
+    }
     if (this.form.invalid) {
       return;
     }
+    this.form.markAsPristine();
     let name = this.form.value.name as string;
     let username = this.form.value.username as string;
     let email = this.form.value.email as string;
     let phone = this.form.value.phone as string;
     let password = this.form.value.password as string;
-    this.userService.updateUser(
-      name,
-      username,
-      email,
-      phone,
-      password
-    );
+    this.userService.updateUser(name, username, email, phone, password);
     this.message = 'Cập nhật thành công';
   }
 

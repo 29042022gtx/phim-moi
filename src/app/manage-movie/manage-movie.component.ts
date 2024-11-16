@@ -5,15 +5,18 @@ import { CommonModule } from '@angular/common';
 import {
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { ManageService } from '../service/manage.service';
+import { AppModule } from '../app.module';
+import { paginationInfo } from '../../ts/entities/PaginationInfo';
 
 @Component({
   selector: 'app-manage-movie',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [AppModule, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './manage-movie.component.html',
   styleUrl: './manage-movie.component.css',
 })
@@ -36,6 +39,12 @@ export class ManageMovieComponent {
   request: string = 'add';
   movieList: Movie[] = [];
   updatingMovieID = '';
+  sort: string = '';
+  search: string = '';
+  pgntInfo: paginationInfo = {
+    itemsPerPage: 4,
+    currentPage: 1,
+  };
 
   constructor(
     private movieService: MovieService,
@@ -43,7 +52,96 @@ export class ManageMovieComponent {
   ) {}
 
   ngOnInit() {
-    this.movieList = this.movieService.getMovieList();
+    this.movieList = this.movieService.getMovieList().slice();
+  }
+
+  getPageMovieList() {
+    if (this.pgntInfo.currentPage > this.getPageQuantity()) {
+      this.pgntInfo.currentPage = this.getPageQuantity();
+    }
+    const startIdx =
+      (this.pgntInfo.currentPage - 1) * this.pgntInfo.itemsPerPage;
+    const endIdx = startIdx + this.pgntInfo.itemsPerPage;
+    return this.getMovieList().slice(startIdx, endIdx);
+  }
+
+  getMovieList() {
+    let movieList = this.movieService.getMovieList().slice();
+    this.sortMovieList(movieList);
+    movieList = this.filterMovieList(movieList);
+    return movieList;
+  }
+
+  getPageQuantity() {
+    const quantity = Math.ceil(
+      this.getMovieList().length / this.pgntInfo.itemsPerPage
+    );
+    return Math.ceil(this.getMovieList().length / this.pgntInfo.itemsPerPage);
+  }
+
+  back() {
+    this.pgntInfo.currentPage -= 1;
+    if (this.pgntInfo.currentPage <= 0) {
+      this.pgntInfo.currentPage = 1;
+    }
+  }
+
+  doubleBack() {
+    this.pgntInfo.currentPage -= 2;
+    if (this.pgntInfo.currentPage <= 0) {
+      this.pgntInfo.currentPage = 1;
+    }
+  }
+
+  next() {
+    this.pgntInfo.currentPage += 1;
+    if (this.pgntInfo.currentPage > this.getPageQuantity()) {
+      this.pgntInfo.currentPage = this.getPageQuantity();
+    }
+  }
+
+  doubleNext() {
+    this.pgntInfo.currentPage += 2;
+    if (this.pgntInfo.currentPage > this.getPageQuantity()) {
+      this.pgntInfo.currentPage = this.getPageQuantity();
+    }
+  }
+
+  skipToEnd() {
+    this.pgntInfo.currentPage = this.getPageQuantity();
+  }
+
+  skipToStart() {
+    this.pgntInfo.currentPage = 1;
+  }
+
+  filterMovieList(movieList: Movie[]) {
+    if (this.search.length == 0) {
+      return movieList;
+    }
+    // this.pgntInfo.currentPage = 1;
+    let key = this.search.trim().toLowerCase();
+    return movieList.filter((movie) => {
+      return movie.name.toLowerCase().indexOf(key) != -1;
+    });
+  }
+
+  sortMovieList(movieList: Movie[]) {
+    switch (this.sort) {
+      case 'date':
+        movieList.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        break;
+      case 'view':
+        movieList.sort((a, b) => b.view - a.view);
+        break;
+      case 'rate':
+        movieList.sort((a, b) => this.getAvgScore(b) - this.getAvgScore(a));
+        break;
+      default:
+        movieList = this.movieService.getMovieList().slice();
+    }
   }
 
   add() {
@@ -121,9 +219,9 @@ export class ManageMovieComponent {
       categoryList,
       description
     );
-    this.submitted = false;
-    this.movieForm.reset();
-    this.movieForm.controls.certificate.setValue('');
+    // this.submitted = false;
+    // this.movieForm.reset();
+    // this.movieForm.controls.certificate.setValue('');
     confirm('Sửa thành công');
   }
 
@@ -194,5 +292,39 @@ export class ManageMovieComponent {
       return 'form-wrapper-valid';
     }
     return 'form-wrapper-invalid';
+  }
+
+  getAvgScore(movie: Movie) {
+    const commentList = movie.commentList;
+    if (commentList.length == 0) {
+      return 0;
+    }
+    let score = 0;
+    commentList.forEach((comment) => {
+      score += comment.score;
+    });
+    return score / commentList.length;
+  }
+
+  getAvgScoreAll() {
+    if (this.movieList.length == 0) {
+      return 0;
+    }
+    let sum = 0;
+    this.movieService.getMovieList().forEach((movie) => {
+      sum += this.getAvgScore(movie);
+    });
+    return sum / this.movieList.length;
+  }
+
+  getAvgViewAll() {
+    if (this.movieList.length == 0) {
+      return 0;
+    }
+    let sum = 0;
+    this.movieList.forEach((movie) => {
+      sum += movie.view;
+    });
+    return sum / this.movieList.length;
   }
 }

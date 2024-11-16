@@ -42,8 +42,8 @@
   </div>
 
   <!-- phim -->
-  <form action="" class="d-flex gap-1 flex-wrap my-3">
-    <div class="ms-auto custom-select-wrapper">
+  <form action="" class="d-flex gap-1 flex-wrap justify-content-end my-3">
+    <div class="custom-select-wrapper">
       <select id="sort" class="form-select" (change)="sortByDate()">
         <option value="">Sắp xếp</option>
         <option value="latest" (click)="sortByDate()">Mới nhất</option>
@@ -110,7 +110,12 @@
                   Chi tiết</a>
               </div>
               <div class="info-end">
-                <div class="text-light"><span>NSX</span> | Year | T12 | Time
+                <div class="text-light"><span>
+                    {{ movie.producerList[0].slice(0, 5) }}
+                  </span> 
+                  | {{ movie.date | date : 'y' }} 
+                  | {{ movie.certificate }} 
+                  | {{ movie.duration }} phút
                 </div>
               </div>
             </div>

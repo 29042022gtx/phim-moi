@@ -11,6 +11,7 @@ import { PackService } from '../service/pack.service';
 import { Pack } from '../../ts/entities/Pack';
 import { UserService } from '../service/user.service';
 import { Bill } from '../../ts/entities/Bill';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pack-page',
@@ -24,23 +25,51 @@ export class PackPageComponent {
   packList: Pack[] = [];
   currentPackID: string = '';
   quantityControl = new FormControl('1');
+  itemQuantity = 0;
+  itemsPerPage = 4;
 
   constructor(
     private userService: UserService,
-    private packService: PackService
+    private packService: PackService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    this.itemQuantity = this.itemsPerPage;
     this.billList = this.userService.getLoggedInUser().billList;
     this.packList = this.packService.getPackList();
     this.currentPackID = this.packList[1].ID;
-    if (this.userService.billIsExpried()) {
+    if (this.userService.billIsExpired()) {
       return;
     }
     const lastBill = this.billList.at(-1) as Bill;
     this.currentPackID = lastBill.packID;
-    this.quantityControl.disable()
+    this.quantityControl.disable();
     this.quantityControl.setValue(String(lastBill.monthQuantity));
+  }
+
+  needShowCollapse() {
+    return this.itemQuantity > this.itemsPerPage;
+  }
+
+  needShowSeeMore() {
+    return this.billList.length > this.itemQuantity;
+  }
+
+  collapse() {
+    this.itemQuantity = this.itemsPerPage;
+  }
+
+  seeMore() {
+    this.itemQuantity += this.itemsPerPage;
+  }
+
+  getLastExpiredDate() {
+    return this.userService.getExpiredDate();
+  }
+
+  lastBillIsExpired() {
+    return this.userService.billIsExpired();
   }
 
   getExpiredDate() {
@@ -48,18 +77,36 @@ export class PackPageComponent {
   }
 
   cancel() {
+    let confirmed = confirm('Xác nhận hủy');
+    if (!confirmed) {
+      return;
+    }
     this.quantityControl.setValue('1');
     this.quantityControl.enable();
     this.userService.cancelBill();
   }
 
   pay() {
+    if (!this.userService.isLoggedIn()) {
+      alert('Đăng nhập để mua gói');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (this.userService.isLocked()) {
+      alert('Tài khoản đã bị khóa');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (this.userService.isAdmin()) {
+      alert('Người quản trị không cần mua');
+      return;
+    }
     this.quantityControl.disable();
     this.userService.addBill(this.currentPackID, this.getMonthQuantity());
   }
 
   isPaid() {
-    return !this.userService.billIsExpried();
+    return !this.userService.billIsExpired();
   }
 
   getPackByID(ID: string) {

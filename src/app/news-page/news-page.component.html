@@ -11,16 +11,28 @@
         <option value="bestRated">Đánh giá tốt nhất</option>
       </select>
     </div>
+    <div class="input-group w-auto">
+      <input (input)="filterResults()" type="text" size="50"
+        [(ngModel)]="searching" name="searching" class="input form-control"
+        placeholder="Tìm sản phẩm" style="max-width: 16em;">
+      <button type="submit" value="Tìm" class="btn btn-light border">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
   </form>
 
   <div class="card border-0">
     <div *ngFor="let news of getNewsList()" class="card-body d-flex">
       <div class="col-4 d-flex align-items-center">
-        <img [src]="news.imgURL" alt="">
+        <a href="" [routerLink]="['/news-detail',news.ID]">
+          <img [src]="news.imgURL" alt="">
+        </a>
       </div>
       <div class="news m-2">
         <h5 class="card-title">
-          {{news.title}}
+          <a href="" [routerLink]="['/news-detail',news.ID]">
+            {{news.title}}
+          </a>
         </h5>
         <p class="card-text news-content d-sm-none d-md-block">
           {{news.content}}

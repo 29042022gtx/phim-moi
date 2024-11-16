@@ -8,6 +8,7 @@ import { AccountPageComponent } from './account-page/account-page.component';
 import { ManagePageComponent } from './manage-page/manage-page.component';
 import { NewsPageComponent } from './news-page/news-page.component';
 import { MovieDetailComponent } from './movie-detail/movie-detail.component';
+import { NewsDetailComponent } from './news-detail/news-detail.component';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'news-page',
     component: NewsPageComponent,
+  },
+  {
+    path: 'news-detail/:ID',
+    component: NewsDetailComponent,
   },
   {
     path: 'pack-page',

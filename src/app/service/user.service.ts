@@ -10,7 +10,6 @@ import { Bill, createBill } from '../../ts/entities/Bill';
 })
 export class UserService {
   protected userList = dataUserList;
-  private adminUsername = 'administrator';
   private currentUsername = 'administrator';
 
   constructor(private movieService: MovieService) {}
@@ -57,14 +56,27 @@ export class UserService {
   }
 
   addBill(packID: string, monthQuantity: number) {
-    if (!this.billIsExpried()) {
+    if (!this.billIsExpired()) {
       return;
     }
     const loggedInUser = this.getLoggedInUser();
     loggedInUser.billList.push(createBill(packID, monthQuantity));
   }
 
-  billIsExpried() {
+  getExpiredDate() {
+    const billList = this.getLoggedInUser().billList;
+    if (billList.length == 0) {
+      return new Date();
+    }
+    const lastBill = billList.at(-1) as Bill;
+    const expiredDate = addMonthToDate(
+      new Date(lastBill.paidDate),
+      lastBill.monthQuantity
+    );
+    return expiredDate;
+  }
+
+  billIsExpired() {
     const billList = this.getLoggedInUser().billList;
     if (billList.length == 0) {
       return true;
@@ -163,7 +175,11 @@ export class UserService {
   }
 
   isAdmin() {
-    return this.currentUsername == this.adminUsername;
+    return this.getLoggedInUser().isAdmin;
+  }
+
+  isLocked() {
+    return this.getLoggedInUser().lock;
   }
 
   isLoggedIn() {

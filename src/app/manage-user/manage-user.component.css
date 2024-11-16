@@ -1,34 +1,4 @@
 td,
 th {
-  padding: 4px 8px;
-}
-
-.table td,
-.table th {
-  background-color: transparent;
-}
-
-.item {
-  cursor: pointer;
-}
-
-.item .infor-item {
-  display: none;
-}
-
-.item:hover .infor-item {
-  display: block;
-}
-
-.infor-item p {
-  font-weight: bold;
-}
-
-.infor-item span {
-  font-weight: normal;
-}
-
-.position-absolute {
-  top: 8px;
-  right: 200px;
+  padding: 2px 4px;
 }

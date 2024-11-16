@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { AppModule } from '../app.module';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import select from '../../ts/select';
 import { Movie } from '../../ts/entities/Movie';
 import { MovieService } from '../service/movie.service';
@@ -23,10 +23,26 @@ export class MoviePageComponent implements OnInit {
   constructor(
     private userService: UserService,
     private movieService: MovieService,
+    private router: Router,
     @Inject(DOCUMENT) private document: Document
   ) {}
 
   ngOnInit(): void {
+    if (!this.userService.isLoggedIn()) {
+      alert('Vui lòng đăng nhập!');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (this.userService.isLocked()) {
+      alert('Tài khoản đã bị khóa');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (!this.userService.isAdmin() && this.userService.billIsExpired()) {
+      alert('Vui lòng mua gói!');
+      this.router.navigateByUrl('/pack-page');
+      return;
+    }
     this.movies = this.movieService.getMovieList();
     select.run(this.document);
   }
@@ -59,8 +75,10 @@ export class MoviePageComponent implements OnInit {
   sortByViews() {
     this.movies.sort((a, b) => b.view - a.view);
   }
+
   // Lọc theo thể loại
   filterByCategory(category: string) {
+    this.currentPage = 1;
     this.selectedCategory = category;
     this.movies = this.movieService.getMovieList();
     if (category) {
@@ -69,6 +87,7 @@ export class MoviePageComponent implements OnInit {
       );
     }
   }
+
   onSortChange(event: Event) {
     const sortType = (event.target as HTMLSelectElement).value;
     if (sortType === 'latest') {
@@ -77,8 +96,8 @@ export class MoviePageComponent implements OnInit {
       this.sortByViews();
     }
   }
-  // search ne
 
+  // search ne
   filterResults() {
     let str = this.searching;
     if (!str) {
@@ -93,11 +112,15 @@ export class MoviePageComponent implements OnInit {
       return false;
     });
   }
+
   // Pagination ne
   currentPage: number = 1;
   itemsPerPage: number = 4;
 
   getMovieList() {
+    if (this.currentPage > this.getTotalPages()) {
+      this.currentPage = this.getTotalPages();
+    }
     const startIdx = (this.currentPage - 1) * this.itemsPerPage;
     const endIdx = startIdx + this.itemsPerPage;
     return this.movies.slice(startIdx, endIdx);

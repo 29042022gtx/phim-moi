@@ -11,7 +11,7 @@
   </h4>
 
   <div class="container-md">
-    <div class="row row-cols-1 row-cols-md-3 g-2">
+    <div class="row row-cols-1 row-cols-md-3 g-2 justify-content-center">
       <div *ngFor="let pack of packList; index as idx" class="col">
         <button [disabled]="isPaid() && !isCurrentPack(pack.ID)"
           (click)="choosePack(pack.ID)"
@@ -83,16 +83,27 @@
           aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div *ngFor="let bill of billList" class="d-flex gap-2 mb-2">
+        <div class="mb-2">
+          <div *ngIf="lastBillIsExpired()">
+            Gói đã hết hạn
+          </div>
+          <div *ngIf="!lastBillIsExpired()">
+            Ngày hết hạn: {{ getLastExpiredDate() | date : 'dd/MM/y' }}
+          </div>
+        </div>
+        <div
+          *ngFor="let bill of billList.slice(0).reverse().slice(0, itemQuantity)"
+          class="d-flex gap-2 mb-2">
           <ng-container *ngFor="let pack of [getPackByID(bill.packID)]">
-            <div class="d-flex align-items-center justify-content-center text-white p-2"
+            <div
+              class="d-flex align-items-center justify-content-center text-white p-2"
               style="background-color: var(--gold); min-width: 6em;">
               {{ pack.name }}
             </div>
             <div>
               <div>
                 <b>
-                  Ngày mua: 
+                  Ngày mua:
                 </b>
                 {{ bill.paidDate | date : 'dd/MM/y' }}
               </div>
@@ -120,6 +131,16 @@
             </div>
           </ng-container>
         </div>
+        <nav class="text-center">
+          <button *ngIf="needShowSeeMore()" (click)="seeMore()"
+            class="btn link-warning">
+            Xem thêm
+          </button>
+          <button *ngIf="needShowCollapse()" (click)="collapse()"
+            class="btn link-warning">
+            Thu gọn
+          </button>
+        </nav>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
