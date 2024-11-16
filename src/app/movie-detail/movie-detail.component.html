@@ -25,7 +25,7 @@
           <span class="fs-5">
             <i class="bi bi-star-fill" aria-hidden="true"
               style="color: orange;"></i>
-            {{ getAvgScore() }}
+            {{ getAvgScore() | number : '1.2-2' }}
           </span>
           ({{ productDetel.commentList.length }} đánh giá)
         </div>
@@ -110,7 +110,7 @@
       </div>
 
     </form>
-    <div *ngFor="let comment of getCommentList().reverse()" class="mb-2">
+    <div *ngFor="let comment of getCommentList()" class="mb-2">
       <div>
         <b>
           {{ comment.username }}
@@ -126,7 +126,17 @@
         {{ comment.content }}
       </div>
     </div>
-    <nav>
+    <nav class="text-center">
+      <button *ngIf="needShowSeeMore()" (click)="seeMore()"
+        class="btn link-warning">
+        Xem thêm
+      </button>
+      <button *ngIf="needShowCollapse()" (click)="collapse()"
+        class="btn link-warning">
+        Thu gọn
+      </button>
+    </nav>
+    <!-- <nav>
       <ul class="pagination justify-content-center">
         <li class="page-item" [class.disabled]="currentCommentPage === 1">
           <button class="page-link" (click)="goToPage(currentCommentPage - 1)"
@@ -145,7 +155,7 @@
             aria-label="Next">&raquo;</button>
         </li>
       </ul>
-    </nav>
+    </nav> -->
   </div>
 
 </div>

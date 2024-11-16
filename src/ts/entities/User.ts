@@ -6,6 +6,8 @@ export interface User {
   email: string;
   phone: string;
   password: string;
+  lock: boolean;
+  isAdmin: boolean;
   favouriteList: string[];
   billList: Bill[];
 }
@@ -23,6 +25,8 @@ export function createUser(
     email,
     phone,
     password,
+    lock: false,
+    isAdmin: false,
     favouriteList: [],
     billList: [],
   };

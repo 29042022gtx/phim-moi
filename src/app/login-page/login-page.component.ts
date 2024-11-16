@@ -53,6 +53,11 @@ export class LoginPageComponent {
       this.message = 'Tên đăng nhập hoặc mật khẩu không đúng!';
       return;
     }
+    if (this.userService.getLoggedInUser().lock) {
+      alert('Tài khoản đã bị khóa');
+      this.userService.logOut();
+      return;
+    }
     this.message = 'Đăng nhập thành công!';
     this.form.reset();
     this.router.navigateByUrl('').then(() => {

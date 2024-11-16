@@ -1,15 +1,15 @@
 import { Component, Inject } from '@angular/core';
 import { AppModule } from '../app.module';
-// import data from '../../ts/data';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { NewsService } from '../service/news.service';
 import select from '../../ts/select';
 import { News } from '../../ts/entities/News';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-news-page',
   standalone: true,
-  imports: [CommonModule, AppModule],
+  imports: [CommonModule, AppModule, RouterLink],
   templateUrl: './news-page.component.html',
   styleUrl: './news-page.component.css',
 })
@@ -33,12 +33,6 @@ export class NewsPageComponent {
     return Math.ceil(this.newsList.length / this.itemsPerPage);
   }
 
-  getNewsList() {
-    const startIdx = (this.currentPage - 1) * this.itemsPerPage;
-    const endIdx = startIdx + this.itemsPerPage;
-    return this.newsList.slice(startIdx, endIdx);
-  }
-
   goToPage(page: number) {
     if (page >= 1 && page <= this.getTotalPages()) {
       this.currentPage = page;
@@ -59,7 +53,7 @@ export class NewsPageComponent {
       case 'bestRated':
         // Sắp xếp theo số lượng like (lượt thích) trừ đi dislike (lượt không thích)
         this.newsList.sort(
-          (a, b) => b.likes - b.dislikes - (a.likes - a.dislikes)
+          (a, b) => this.getNewsScore(b) - this.getNewsScore(a)
         );
         break;
       default:
@@ -67,5 +61,43 @@ export class NewsPageComponent {
         this.newsList = this.newsService.getNewsList(); // Gán lại dữ liệu ban đầu nếu không sắp xếp
         break;
     }
+  }
+
+  // Viết phương thức tính điểm cho bài viết
+  getNewsScore(news: News) {
+    let score = 0;
+    news.rateList.forEach((rate) => {
+      if (rate.like) {
+        score += 1;
+      } else {
+        score -= 1;
+      }
+    });
+    return score;
+  }
+
+  searching: string = '';
+
+  filterResults() {
+    let str = this.searching;
+    if (!str) {
+      this.newsList = this.newsService.getNewsList();
+      return;
+    }
+    str = str.trim().toLowerCase();
+    this.newsList = this.newsList.filter(function (searching) {
+      if (searching.title.toLowerCase().indexOf(str) !== -1) {
+        return true;
+      }
+      return false;
+    });
+  }
+  getNewsList() {
+    if (this.currentPage > this.getTotalPages()) {
+      this.currentPage = this.getTotalPages();
+    }
+    const startIdx = (this.currentPage - 1) * this.itemsPerPage;
+    const endIdx = startIdx + this.itemsPerPage;
+    return this.newsList.slice(startIdx, endIdx);
   }
 }

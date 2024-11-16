@@ -1,48 +1,137 @@
-<div>
-  <h4 class="d-inline-block">
-    Tổng số thành viên:
+<div class="d-flex align-items-center justify-content-between">
+  <div>
+    Số thành viên:
     {{userList.length}}
-  </h4>
-  <button class="btn btn-success float-end" data-bs-toggle="modal"
-    data-bs-target="#newUser">
-    <i class="bi bi-person-plus-fill"></i>
-    Thêm thành viên
-  </button>
+    |
+    Tài khoản quản trị:
+    <i class="bi bi-database-gear"></i>
+    {{ getAdminUserQuantity() }}
+    |
+    Số tài khoản khóa:
+    <i class="bi bi-lock"></i>
+    {{ getLockUserQuantity() }}
+  </div>
+  <div>
+    <button (click)="openUpdate(getLoggedInUsername())"
+      class="btn btn-warning me-1" data-bs-toggle="modal"
+      data-bs-target="#newUser">
+      <i class="bi bi-person-fill"></i>
+      Sửa
+    </button>
+    <button (click)="openAdd()" class="btn btn-success" data-bs-toggle="modal"
+      data-bs-target="#newUser">
+      <i class="bi bi-person-plus-fill"></i>
+      Thêm
+    </button>
+  </div>
 </div>
-<table>
+<form action="" class="d-flex gap-1 flex-wrap mb-1">
+  <div class="custom-select-wrapper">
+    <select [(ngModel)]="filterSelect" name="sort" id="filterUser" class="form-select">
+      <option value="">Lọc</option>
+      <option value="lock">Bị khóa</option>
+      <option value="admin">Quản trị</option>
+    </select>
+  </div>
+  <div>
+    <input [(ngModel)]="filterSearch" type="text" name="search" id="searchUser"
+      class="form-control" placeholder="Tìm kiếm">
+  </div>
+</form>
+<table class="mb-2">
   <tbody>
     <tr>
       <th>Tên đăng nhập</th>
       <th>Mật khẩu</th>
       <th>Email</th>
       <th>Số điện thoại</th>
-      <th>Xóa</th>
-      <th>Khóa</th>
-      <th>Sửa</th>
+      <th>Quản lí</th>
     </tr>
-    <tr *ngFor="let user of userList">
-      <td>{{user.username}}</td>
+    <tr *ngFor="let user of getPageUserList()">
+      <td class="d-flex gap-1 justify-content-between">
+        <div class="d-inline-block">
+          {{ user.username }}
+        </div>
+        <div>
+          <span *ngIf="user.isAdmin"
+            class="ms-auto badge rounded-pill bg-danger">
+            <i class="bi bi-person-fill-gear"></i>
+          </span>
+        </div>
+      </td>
       <td>{{user.password}}</td>
       <td>{{user.email}}</td>
       <td>{{user.phone}}</td>
-      <td>
-        <button class="btn btn-danger">
+      <td class="d-flex gap-1">
+        <button (click)="deleteUser(user.username)" class="btn btn-danger">
           Xóa
         </button>
-      </td>
-      <td>
-        <button class="btn btn-dark">
+        <button *ngIf="!user.lock" (click)="lockUser(user.username)"
+          class="btn btn-dark">
           Khóa
         </button>
-      </td>
-      <td>
-        <button class="btn btn-warning">
+        <button *ngIf="user.lock" (click)="unlockUser(user.username)"
+          class="btn btn-light bg-secondary-subtle position-relative">
+          <span class="position-absolute start-50 translate-middle-x">
+            Mở
+          </span>
+          <span class="opacity-0">
+            Khóa
+          </span>
+        </button>
+        <button (click)="openUpdate(user.username)" class="btn btn-warning"
+          data-bs-toggle="modal" data-bs-target="#newUser">
           Sửa
         </button>
       </td>
     </tr>
   </tbody>
 </table>
+
+<div class="text-center">
+
+  <div>
+    <div class="d-inline-flex gap-1 align-items-center">
+      Phần tử mỗi trang
+      <input [(ngModel)]="pgntInfo.itemsPerPage" id="userPerPage" type="number" min="0"
+        class="form-control" style="width: 5em;">
+    </div>
+    <br>
+    <div class="d-inline-flex">
+      <button (click)="skipToStart()"
+        class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-skip-start-fill"></i>
+      </button>
+      <button (click)="doubleBack()"
+        class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-chevron-double-left"></i>
+      </button>
+      <button (click)="back()" class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <div class="d-flex gap-1 align-items-center">
+        <input [(ngModel)]="pgntInfo.currentPage" id="currentUserPage" type="number" min="0"
+          class="form-control" style="width: 5em;">
+        /{{ getPageQuantity() }}
+      </div>
+
+
+      <button (click)="next()" class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button (click)="doubleNext()"
+        class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-chevron-double-right"></i>
+      </button>
+      <button (click)="skipToEnd()"
+        class="btn btn-light bg-transparent border-0">
+        <i class="bi bi-skip-end-fill"></i>
+      </button>
+
+    </div>
+  </div>
+</div>
 
 <!-- modal -->
 <div class="modal fade" id="newUser">
@@ -141,7 +230,9 @@
 
         <div [ngClass]="getPasswordWrapperClass(userForm.controls.password)"
           class="form-floating form-wrapper mb-3">
-          <input formControlName="password" type="password" class="form-control"
+          <input
+            (input)="this.userForm.controls.confirmPassword.updateValueAndValidity()"
+            formControlName="password" type="password" class="form-control"
             id="password" placeholder="" autocomplete="new-password">
           <label for="password">
             <span class="form-message message-0">
@@ -190,15 +281,24 @@
           </label>
         </div>
 
-        <button (click)="submit()"
+        <div class="d-flex gap-2 mb-3">
+          <label for="isAdmin">
+            Quản trị
+          </label>
+          <input formControlName="isAdmin" type="checkbox" id="isAdmin"
+            class="form-check-input">
+        </div>
+
+        <button *ngIf="request == 'add'" (click)="add()"
           class="mb-31 d-block w-100 btn btn-warning text-white"
           data-bs-dismiss="modal1">
-          Ok
+          Thêm
         </button>
-
-        <div class="me-auto" style="min-height: 1.5em;">
-          {{ userFormMessage }}
-        </div>
+        <button *ngIf="request == 'update'" (click)="update()"
+          class="mb-31 d-block w-100 btn btn-warning text-white"
+          data-bs-dismiss="modal1">
+          Sửa
+        </button>
       </form>
     </div>
   </div>

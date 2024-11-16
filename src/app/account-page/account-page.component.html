@@ -129,7 +129,7 @@
 
         <div [ngClass]="getPasswordWrapperClass(form.controls.password)"
           class="form-floating form-wrapper mb-3">
-          <input formControlName="password" type="password" class="form-control"
+          <input (input)="this.form.controls.confirmPassword.updateValueAndValidity()" formControlName="password" type="password" class="form-control"
             id="password" placeholder="" autocomplete="new-password">
           <label for="password">
             <span class="form-message message-0">

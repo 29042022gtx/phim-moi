@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { createMovie, Movie } from '../../ts/entities/Movie';
 import {
   FormControl,
@@ -26,18 +26,35 @@ export class MovieDetailComponent implements OnInit {
     content: new FormControl(''),
   });
   formMessage = '';
-  currentCommentPage: number = 1;
-  itemsPerPage: number = 4;
+  commentQuantity: number = 0;
+  itemsPerPage: number = 5;
   productDetel: Movie = createMovie();
 
   constructor(
     private userService: UserService,
     private movieService: MovieService,
-    private router: ActivatedRoute
+    private router: Router,
+    private activatedRout: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    let ID = this.router.snapshot.params['ID'];
+    if (!this.userService.isLoggedIn()) {
+      alert('Vui lòng đăng nhập!');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (this.userService.isLocked()) {
+      alert('Tài khoản đã bị khóa');
+      this.router.navigateByUrl('/login-page');
+      return;
+    }
+    if (!this.userService.isAdmin() && this.userService.billIsExpired()) {
+      alert('Vui lòng mua gói!');
+      this.router.navigateByUrl('/pack-page');
+      return;
+    }
+    this.commentQuantity = this.itemsPerPage;
+    let ID = this.activatedRout.snapshot.params['ID'];
     this.productDetel = this.movieService.getMovieByID(ID) || createMovie();
     let commentIndex = this.getCommentIndex();
     if (commentIndex == -1) {
@@ -50,19 +67,26 @@ export class MovieDetailComponent implements OnInit {
   }
 
   getCommentList() {
-    const startIdx = (this.currentCommentPage - 1) * this.itemsPerPage;
-    const endIdx = startIdx + this.itemsPerPage;
-    return this.productDetel.commentList.slice(startIdx, endIdx);
+    return this.productDetel.commentList
+      .slice(0)
+      .reverse()
+      .slice(0, this.commentQuantity);
   }
 
-  getTotalPages() {
-    return Math.ceil(this.productDetel.commentList.length / this.itemsPerPage);
+  needShowCollapse() {
+    return this.commentQuantity > this.itemsPerPage;
   }
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.getTotalPages()) {
-      this.currentCommentPage = page;
-    }
+  needShowSeeMore() {
+    return this.productDetel.commentList.length > this.commentQuantity;
+  }
+
+  collapse() {
+    this.commentQuantity = this.itemsPerPage;
+  }
+
+  seeMore() {
+    this.commentQuantity += this.itemsPerPage;
   }
 
   submit() {

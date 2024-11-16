@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:PhimMoi": "node dist/phim-moi/server/server.mjs"
+    "serve:ssr:PhimMoi": "node dist/phim-moi/server/server.mjs",
+      "deploy:gh-pages": "git checkout -B gh-pages && npm run build && git add dist && git commit -m \"Deploy pages\" && git push origin `git subtree split --prefix dist/phim-moi/browser`:gh-pages --force && git checkout main"
   },
   "private": true,
   "dependencies": {

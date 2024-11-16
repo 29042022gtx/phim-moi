@@ -9,6 +9,12 @@ export class NewsService {
 
   constructor() {}
 
+  getNewsByID(ID: string) {
+    return this.newsList.find((news) => {
+      return news.ID == ID;
+    });
+  }
+
   getNewsList() {
     return this.newsList;
   }

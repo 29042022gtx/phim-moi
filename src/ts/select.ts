@@ -7,6 +7,7 @@ function run(document: Document) {
     ) as NodeListOf<HTMLElement>
   );
   selectWrapperList.forEach((selectWrapper) => {
+    return;
     const select = selectWrapper.querySelector('select') as HTMLSelectElement;
     if (select == null) {
       return;
@@ -51,10 +52,12 @@ function run(document: Document) {
       }
     });
   });
+
   function focusSelect(select: HTMLSelectElement) {
     select.size = select.childElementCount;
     select.style.padding = '0';
   }
+
   function blurSelect(select: HTMLSelectElement) {
     select.size = 1;
     select.style.padding = '0.375rem 2.25rem 0.375rem 0.75rem';
